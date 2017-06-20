@@ -1,7 +1,7 @@
 package ps0;
 
 import java.io.*;
-import java.util.*;
+import java.math.BigInteger;
 
 public class Addition { // as the class name that contains the main method is "Addition", you have to save this file as "Addition.java", and submit "Addition.java" to Codecrunch
   public static void main(String[] args) {
@@ -11,10 +11,10 @@ public class Addition { // as the class name that contains the main method is "A
       // read two integers A and B
       // if both are -1, stop
       // output A+B
-    	int A = sc.nextInt();
-    	int B = sc.nextInt();
+    	BigInteger A = new BigInteger(Integer.toString(sc.nextInt()));
+    	BigInteger B = new BigInteger(Integer.toString(sc.nextInt()));
     	
-    	if ((A == -1) && (B == -1)) {
+    	if (checkBreak(A, B)) {
     		break;
     	}
     	
@@ -22,8 +22,12 @@ public class Addition { // as the class name that contains the main method is "A
     }
   }
   
-  public static int sum(int A, int B) {
-	  return A+B;
+  public static boolean checkBreak(BigInteger A, BigInteger B) {
+	  return A.equals(new BigInteger("-1")) && B.equals(new BigInteger("-1"));
+  }
+  
+  public static BigInteger sum(BigInteger A, BigInteger B) {
+	  return A.add(B);
   }
 }
 
