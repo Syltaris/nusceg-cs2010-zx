@@ -2,6 +2,7 @@ package ps0;
 
 import static org.junit.Assert.*;
 
+import java.io.ByteArrayInputStream;
 import java.math.BigInteger;
 import java.util.Random;
 
@@ -20,5 +21,38 @@ public class AdditionTest {
 		
 		assertEquals(localResult, sumResult);
 	}
+	
+	@Test
+	public void checkBreakMustReturnTrue() {
+		BigInteger A = new BigInteger("-1");
+		BigInteger B = new BigInteger("-1");
+		
+		assertTrue(Addition.checkBreak(A, B));
+	}
+	
+	@Test
+	public void checkBreakMustReturnFalse() {
+		BigInteger A = new BigInteger("-1");
+		BigInteger B = new BigInteger("4");
+		
+		assertFalse(Addition.checkBreak(A, B));
+	}
+	
+	@Test
+	public void inputsMustBeParsedCorrectly() {
+		String testString = "7 4\n-1 -1";
+		IntegerScanner sc = new IntegerScanner(new ByteArrayInputStream(testString.getBytes()));
+		
+    	BigInteger A = new BigInteger(Integer.toString(sc.nextInt()));
+    	BigInteger B = new BigInteger(Integer.toString(sc.nextInt()));
 
+		assertEquals(new BigInteger("7"), A);
+		assertEquals(new BigInteger("4"), B);
+		
+    	A = new BigInteger(Integer.toString(sc.nextInt()));
+    	B = new BigInteger(Integer.toString(sc.nextInt()));
+
+		assertEquals(new BigInteger("-1"), A);
+		assertEquals(new BigInteger("-1"), B);
+	}
 }
