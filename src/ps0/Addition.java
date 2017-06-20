@@ -14,7 +14,7 @@ public class Addition { // as the class name that contains the main method is "A
     	int A = sc.nextInt();
     	int B = sc.nextInt();
     	
-    	if ((A == -1) || (B == -1)) {
+    	if ((A == -1) && (B == -1)) {
     		break;
     	}
     	
