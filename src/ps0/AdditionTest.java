@@ -11,10 +11,9 @@ import org.junit.Test;
 public class AdditionTest {
 	@Test
 	public void sumOfValidBigIntMustBeCorrect() {
-		//sum of the 2 numbers, A and B, must be correct
-		//NOTE: must skip limits, else no way to break out of loop!
-		BigInteger A = new BigInteger(64, new Random());
-		BigInteger B = new BigInteger(64, new Random());
+		
+    	BigInteger A = new BigInteger("734534534534647673");
+    	BigInteger B = new BigInteger("899998989894895385");
 		
 		BigInteger localResult = A.add(B);
 		BigInteger sumResult = Addition.sum(A, B);
@@ -40,17 +39,23 @@ public class AdditionTest {
 	
 	@Test
 	public void inputsMustBeParsedCorrectly() {
-		String testString = "7 4\n-1 -1";
+		String testString = "12 128\n234234234234 4\n-1 -1";
 		IntegerScanner sc = new IntegerScanner(new ByteArrayInputStream(testString.getBytes()));
 		
-    	BigInteger A = new BigInteger(Integer.toString(sc.nextInt()));
-    	BigInteger B = new BigInteger(Integer.toString(sc.nextInt()));
+    	BigInteger A = sc.nextInt();
+    	BigInteger B = sc.nextInt();
 
-		assertEquals(new BigInteger("7"), A);
+		assertEquals(new BigInteger("12"), A);
+		assertEquals(new BigInteger("128"), B);
+    	
+    	A = sc.nextInt();
+    	B = sc.nextInt();
+
+		assertEquals(new BigInteger("234234234234"), A);
 		assertEquals(new BigInteger("4"), B);
 		
-    	A = new BigInteger(Integer.toString(sc.nextInt()));
-    	B = new BigInteger(Integer.toString(sc.nextInt()));
+    	A = sc.nextInt();
+    	B = sc.nextInt();
 
 		assertEquals(new BigInteger("-1"), A);
 		assertEquals(new BigInteger("-1"), B);

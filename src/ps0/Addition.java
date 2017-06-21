@@ -2,6 +2,7 @@ package ps0;
 
 import java.io.*;
 import java.math.BigInteger;
+import java.util.Stack;
 
 public class Addition { // as the class name that contains the main method is "Addition", you have to save this file as "Addition.java", and submit "Addition.java" to Codecrunch
   public static void main(String[] args) {
@@ -11,8 +12,8 @@ public class Addition { // as the class name that contains the main method is "A
       // read two integers A and B
       // if both are -1, stop
       // output A+B
-    	BigInteger A = new BigInteger(Integer.toString(sc.nextInt()));
-    	BigInteger B = new BigInteger(Integer.toString(sc.nextInt()));
+    	BigInteger A = sc.nextInt();
+    	BigInteger B = sc.nextInt();
     	
     	if (checkBreak(A, B)) {
     		break;
@@ -39,42 +40,36 @@ class IntegerScanner { // coded by Ian Leow, we will use this quite often in CS2
     bis = new BufferedInputStream(is, 1000000);
   }
   
-  public int nextInt() {
-    int result = 0;
+  public BigInteger nextInt() {
     try {
-    	
     	//SELF: checks if byte is -1? return immediately, means checking for null?
       int cur = bis.read();
       if (cur == -1)
-        return -1;
+        return new BigInteger("-1");
 
       //SELF: what does this do? 48? 57? 57-48 == 9, so means 0-9, finding for bytecode of digits
       //until bytecode 45 is found, if found, skip to next part?
       while ((cur < 48 || cur > 57) && cur != 45) {
-        cur = bis.read(); //reads in next byte untill bytecode of digit is reached
+        cur = bis.read(); //reads in next byte until bytecode of digit is reached
       }
 
-      //SELF: 45 bytecode that means negative number?
-      boolean negate = false;
+      String result = new String();
+      //SELF: 45 bytecode that means '-'
       if (cur == 45) {
-        negate = true;
+    	result = result.concat("-");
         cur = bis.read(); //reads in next byte
       }
 
       //SELF: continues checking next bytes, while doing numerical conversion of each byte
       while (cur >= 48 && cur <= 57) {
-        result = result*10 + (cur-48);
+    	result = result.concat(""+(cur-48));
         cur = bis.read(); //reads in next number
       }
-
-      //SELF: returns negated number as result, if negative sign found at start
-      if (negate) {
-        return -result;
-      }
-      return result;
+      
+      return new BigInteger(result);
     }
     catch (IOException ioe) {
-      return -1;
+      return new BigInteger("-1");
     }
   }
 }
