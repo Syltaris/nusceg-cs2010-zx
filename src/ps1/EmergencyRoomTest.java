@@ -3,17 +3,12 @@ import static org.junit.Assert.*;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
 import java.util.StringTokenizer;
 
 import org.junit.Test;
@@ -24,12 +19,12 @@ public class EmergencyRoomTest {
 	ERPatient_MaxPriorityQueue patientQueue = new ERPatient_MaxPriorityQueue(MAX_HEAP_SIZE);
 	
 	@Test
-	public void mainTest() {
+	public void mainTestUsingFile() {
 		EmergencyRoom ps1 = new EmergencyRoom();
 		
 //		String testInput = "15\n0 GRACE 31\n0 THOMAS 55\n0 MARIA 42\n3\n0 CINDY 77\n3\n1 GRACE 24\n2 CINDY\n3\n2 MARIA\n3\n2 GRACE\n3\n2 THOMAS\n3";
 		
-		File testFile = new File("D:\\Repos\\cs2010-zx\\src\\ps1\\test1.txt");
+		File testFile = new File("D:\\Repos\\cs2010-zx\\src\\ps1\\test2.txt");
 		
 		BufferedReader br = null;
 		try {
@@ -75,6 +70,8 @@ public class EmergencyRoomTest {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
+			System.out.println((26-numCMD) + ps1.showQueue());
 		}
 		pr.close();
 	}
