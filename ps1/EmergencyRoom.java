@@ -139,7 +139,12 @@ class EmergencyRoom {
 				arrayHeap[++numOfPatients] = newPatient;
 			} else {
 				arrayHeap[++numOfPatients] = newPatient;
-				shiftUp(numOfPatients);
+				
+				try {
+					shiftUp(numOfPatients);
+				} catch(Exception e) {
+					System.out.println(e);
+				}
 			}
 		}
 		
@@ -149,6 +154,32 @@ class EmergencyRoom {
 		
 		public void update_key() {
 			
+		}
+		
+		//helper methods
+		//check if parent of current node has lower priority level,
+		//if so, swap and check parent of updated node and repeat
+		//else, continue checking next node sequentially in descending index
+		private void shiftUp(int startPos) throws Exception {
+			//if at root or invalid pos
+			if(startPos <= 1) {
+				throw new Exception("invalid node index");
+			}
+			int currPos = startPos;
+			
+			while(currPos > 1) {
+				int parentPos = currPos/2; //if odd, will round down to correct pos
+				if(arrayHeap[parentPos].getPriority() < arrayHeap[currPos].getPriority()) {
+					swap(parentPos, currPos);
+				}
+			}
+		}
+		
+		//receives 2 indexes of ERPatient to be swapped in arrayHeap and swaps them
+		private void swap(int indexOfElement1, int indexOfElement2) {
+			ERPatient tempERPatient= arrayHeap[indexOfElement1];
+			arrayHeap[indexOfElement1] = arrayHeap[indexOfElement2];
+			arrayHeap[indexOfElement2] = tempERPatient;
 		}
 	}
 	
