@@ -106,7 +106,7 @@ class EmergencyRoom {
 		// remove him/her from your chosen data structure
 		//
 		// write your answer here
-		patientQueue.update_key(patientName, 100);
+		patientQueue.update_key(patientName, MAX_EMERGENCY_LEVEL);
 		ERPatient nextPatient = patientQueue.extract_max();
 		System.out.println(nextPatient.getName());
 
@@ -128,6 +128,10 @@ class EmergencyRoom {
 		}
 
 		return ans;
+	}
+	
+	public String showQueue() {
+		return patientQueue.toString();
 	}
 
 	void run() throws Exception {
@@ -176,7 +180,7 @@ class ERPatient_MaxPriorityQueue {
 	}
 
 	public ERPatient peek() {
-		return arrayHeap[1];
+		return numOfPatients == 0? null : arrayHeap[1];
 	}
 	
 	public void insert(ERPatient newPatient) {
@@ -210,7 +214,7 @@ class ERPatient_MaxPriorityQueue {
 	public void update_key(String patientName, int incEmergencyLvl) {
 		int currPos = 0;
 		
-		for(int i = 1; i<numOfPatients; i++) {
+		for(int i = 1; i <= numOfPatients; i++) {
 			//find patient and update priorityLevel
 			if(arrayHeap[i].getName().equals(patientName)) {
 				arrayHeap[i].setPriority(incEmergencyLvl);
@@ -219,11 +223,16 @@ class ERPatient_MaxPriorityQueue {
 			}
 		}
 		
+		System.out.println(currPos);
+		
 		//shift-up if curr node bigger than parent node
 		//else shift down
-		if(arrayHeap[currPos/2].getPriority() < arrayHeap[currPos].getPriority()) {
+		if(currPos<=1) {
+			return;
+		}
+		else if((arrayHeap[currPos/2].getPriority() < arrayHeap[currPos].getPriority())) {
 			shiftUp(currPos);
-		} else {
+		} else if(!(currPos*2 > numOfPatients)){
 			shiftDown(currPos);
 		}
 	}
@@ -245,7 +254,7 @@ class ERPatient_MaxPriorityQueue {
 
 	private void shiftDown(int startPos) {
 		int currPos = startPos;
-		int childPos = currPos / 2; // left child of current parent
+		int childPos = currPos * 2; // left child of current parent
 
 		// find larger element of the 2 children
 		if (arrayHeap[childPos + 1].getPriority() > arrayHeap[childPos].getPriority() && !(childPos >= numOfPatients)) {
