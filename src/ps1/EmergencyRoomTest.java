@@ -75,7 +75,6 @@ public class EmergencyRoomTest {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			System.out.println(ps1.showQueue());
 		}
 		pr.close();
 	}
@@ -87,8 +86,6 @@ public class EmergencyRoomTest {
 		patientQueue.insert(new ERPatient("FOURTH PATIENT", 100));
 		patientQueue.insert(new ERPatient("THIRD PATIENT", 80));
 
-		
-		System.out.println(patientQueue.toString());
 	}
 	
 	@Test

@@ -73,34 +73,18 @@ class EmergencyRoom {
 	private static final int MAX_EMERGENCY_LEVEL = 100;
 	private ERPatient_MaxPriorityQueue patientQueue;
 
-	// create array to fit all emergency levels 30-100
 	public EmergencyRoom() {
-		// Write necessary code during construction
-		//
-		// write your answer here
 		this.patientQueue = new ERPatient_MaxPriorityQueue(MAX_EMERGENCY_LEVEL);
 	}
 
-	// insert
 	void ArriveAtHospital(String patientName, int emergencyLvl) {
-		// You have to insert the information (patientName, emergencyLvl)
-		// into your chosen data structure
-		//
-		// write your answer here
 		patientQueue.insert(new ERPatient(patientName, emergencyLvl));
 	}
 
-	// update_key/node
 	void UpdateEmergencyLvl(String patientName, int incEmergencyLvl) {
-		// You have to update the emergencyLvl of patientName to
-		// emergencyLvl += incEmergencyLvl
-		// and modify your chosen data structure (if needed)
-		//
-		// write your answer here
 		patientQueue.update_key(patientName, incEmergencyLvl);
 	}
 
-	// extract_max
 	void Treat(String patientName) {
 		// This patientName is treated by the doctor
 		// remove him/her from your chosen data structure
@@ -108,8 +92,6 @@ class EmergencyRoom {
 		// write your answer here
 		patientQueue.update_key(patientName, MAX_EMERGENCY_LEVEL);
 		ERPatient nextPatient = patientQueue.extract_max();
-		System.out.println(nextPatient.getName());
-
 	}
 
 	// if null, don't change ans
@@ -128,10 +110,6 @@ class EmergencyRoom {
 		}
 
 		return ans;
-	}
-	
-	public String showQueue() {
-		return patientQueue.toString();
 	}
 
 	void run() throws Exception {
@@ -217,14 +195,11 @@ class ERPatient_MaxPriorityQueue {
 		for(int i = 1; i <= numOfPatients; i++) {
 			//find patient and update priorityLevel
 			if(arrayHeap[i].getName().equals(patientName)) {
-				arrayHeap[i].setPriority(incEmergencyLvl);
+				arrayHeap[i].setPriority(arrayHeap[i].getPriority() + incEmergencyLvl);
 				currPos = i;
 				break;
 			}
 		}
-		
-		System.out.println(currPos);
-		
 		//shift-up if curr node bigger than parent node
 		//else shift down
 		if(currPos<=1) {
@@ -273,18 +248,6 @@ class ERPatient_MaxPriorityQueue {
 		ERPatient tempERPatient = arrayHeap[indexOfElement1];
 		arrayHeap[indexOfElement1] = arrayHeap[indexOfElement2];
 		arrayHeap[indexOfElement2] = tempERPatient;
-	}
-
-	@Override
-	public String toString() {
-		String outputString = new String();
-
-		for (int i = 1; i <= numOfPatients; i++) {
-			outputString = outputString.concat(arrayHeap[i].getName());
-			outputString = outputString.concat(" " + arrayHeap[i].getPriority() + "\n");
-		}
-
-		return outputString;
 	}
 }
 
