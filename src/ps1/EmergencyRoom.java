@@ -15,7 +15,7 @@ class EmergencyRoom {
 	private ERPatient_MaxPriorityQueue patientQueue;
 
 	public EmergencyRoom() {
-		this.patientQueue = new ERPatient_MaxPriorityQueue(MAX_EMERGENCY_LEVEL+1);
+		this.patientQueue = new ERPatient_MaxPriorityQueue(MAX_EMERGENCY_LEVEL + 1);
 	}
 
 	void ArriveAtHospital(String patientName, int emergencyLvl) {
@@ -27,7 +27,7 @@ class EmergencyRoom {
 	}
 
 	void Treat(String patientName) {
-		try {		
+		try {
 			patientQueue.update_key(patientName, MAX_EMERGENCY_LEVEL);
 			patientQueue.extract_max();
 		} catch (Exception e) {
@@ -40,13 +40,13 @@ class EmergencyRoom {
 		String ans = "The emergency room is empty";
 
 		ERPatient nextPatient = patientQueue.peek();
-		if(nextPatient != null) {
+		if (nextPatient != null) {
 			ans = nextPatient.getName();
 		}
 
 		return ans;
 	}
-	
+
 	public String showQueue() {
 		return patientQueue.toString();
 	}
@@ -101,36 +101,35 @@ class ERPatient_MaxPriorityQueue {
 	public ERPatient peek() {
 		return numOfPatients == 0 ? null : arrayHeap[1];
 	}
-	
+
 	public void insert(ERPatient newPatient) {
 		// simply insert patient to root if 1st element, increment numOfPatients
 		// else, add patient to end of heap, check if need shiftUp starting from
 		// last node
-//		if (numOfPatients == 0) {
-//			arrayHeap[++numOfPatients] = newPatient;
-//			patientIndexMap.put(newPatient.getName(), numOfPatients);
-//		} else {
-			arrayHeap[++numOfPatients] = newPatient;
-			patientIndexMap.put(newPatient.getName(), numOfPatients);
+		arrayHeap[++numOfPatients] = newPatient;
+		patientIndexMap.put(newPatient.getName(), numOfPatients);
 
-			shiftUp(numOfPatients);
-//		}
+		shiftUp(numOfPatients);
+
 	}
 
 	public ERPatient extract_max() throws Exception {
 		ERPatient outputPatient = arrayHeap[1];
 
-		if(numOfPatients <= 0) {
+		if (numOfPatients <= 0) {
 			throw new Exception("invalid array index");
 		}
-		
+
 		if (numOfPatients == 1) {
 			patientIndexMap.remove(arrayHeap[numOfPatients].getName());
-			return arrayHeap[numOfPatients--]; 	// if left 1 patient, just return last patient and lazy delete root	
+			return arrayHeap[numOfPatients--]; // if left 1 patient, just return
+												// last patient and lazy delete
+												// root
 		} else {
-			arrayHeap[1] = arrayHeap[numOfPatients--]; // lazy delete of last node, put to root
+			arrayHeap[1] = arrayHeap[numOfPatients--]; // lazy delete of last
+														// node, put to root
 			patientIndexMap.replace(arrayHeap[1].getName(), 1);
-			
+
 			shiftDown(1);
 		}
 
@@ -141,23 +140,13 @@ class ERPatient_MaxPriorityQueue {
 		int currPos = patientIndexMap.get(patientName);
 		arrayHeap[currPos].setPriority(arrayHeap[currPos].getPriority() + incEmergencyLvl);
 
-		
-//		for(int i = 1; i <= numOfPatients; i++) {
-//			//find patient and update priorityLevel
-//			if(arrayHeap[i].getName().equals(patientName)) {
-//				arrayHeap[i].setPriority(arrayHeap[i].getPriority() + incEmergencyLvl);
-//				currPos = i;
-//				break;
-//			}
-//		}
-		//shift-up if curr node bigger than parent node
-		//else shift down
-		if(currPos<=1) {
+		// shift-up if curr node bigger than parent node
+		// else shift down
+		if (currPos <= 1) {
 			return;
-		}
-		else if((arrayHeap[currPos/2].getPriority() <= arrayHeap[currPos].getPriority())) {
+		} else if ((arrayHeap[currPos / 2].getPriority() <= arrayHeap[currPos].getPriority())) {
 			shiftUp(currPos);
-		} else if(currPos*2 <= numOfPatients){
+		} else if (currPos * 2 <= numOfPatients) {
 			shiftDown(currPos);
 		}
 	}
@@ -171,8 +160,9 @@ class ERPatient_MaxPriorityQueue {
 		int parentPos = currPos / 2;
 
 		while ((parentPos > 0) && (arrayHeap[parentPos].getPriority() <= arrayHeap[currPos].getPriority())) {
-			//if same emergency level but curr patient came later than parent patient
-			if(arrayHeap[parentPos].getPriority() == arrayHeap[currPos].getPriority()
+			// if same emergency level but curr patient came later than parent
+			// patient
+			if (arrayHeap[parentPos].getPriority() == arrayHeap[currPos].getPriority()
 					&& arrayHeap[parentPos].getID() < arrayHeap[currPos].getID()) {
 				break;
 			}
@@ -186,32 +176,33 @@ class ERPatient_MaxPriorityQueue {
 		int currPos = startPos;
 		int childPos = currPos * 2; // left child of current parent
 
-		// find larger element of the 2 children, if same priority, find earlier patient
+		// find larger element of the 2 children, if same priority, find earlier
+		// patient
 		if (!(childPos >= numOfPatients)) {
-			if(arrayHeap[childPos + 1].getPriority() > arrayHeap[childPos].getPriority() 
-					|| ((arrayHeap[childPos + 1].getPriority() == arrayHeap[childPos].getPriority()) 
-					&& arrayHeap[childPos + 1].getID() < arrayHeap[childPos].getID())) {
+			if (arrayHeap[childPos + 1].getPriority() > arrayHeap[childPos].getPriority()
+					|| ((arrayHeap[childPos + 1].getPriority() == arrayHeap[childPos].getPriority())
+							&& arrayHeap[childPos + 1].getID() < arrayHeap[childPos].getID())) {
 				childPos++;
-			} 
+			}
 		}
-		
+
 		while ((childPos <= numOfPatients) && (arrayHeap[childPos].getPriority() >= arrayHeap[currPos].getPriority())) {
-			//if same emergency level but child came before curr patient
-			if(arrayHeap[childPos].getPriority() == arrayHeap[currPos].getPriority()
+			// if same emergency level but child came before curr patient
+			if (arrayHeap[childPos].getPriority() == arrayHeap[currPos].getPriority()
 					&& arrayHeap[childPos].getID() > arrayHeap[currPos].getID()) {
 				break;
 			}
-			
+
 			swap(childPos, currPos);
 			currPos = childPos;
 			childPos = currPos * 2; // if odd, will round down to correct pos
-			
+
 			if (!(childPos >= numOfPatients)) {
-				if(arrayHeap[childPos + 1].getPriority() > arrayHeap[childPos].getPriority() 
-						|| ((arrayHeap[childPos + 1].getPriority() == arrayHeap[childPos].getPriority()) 
-						&& arrayHeap[childPos + 1].getID() < arrayHeap[childPos].getID())) {
+				if (arrayHeap[childPos + 1].getPriority() > arrayHeap[childPos].getPriority()
+						|| ((arrayHeap[childPos + 1].getPriority() == arrayHeap[childPos].getPriority())
+								&& arrayHeap[childPos + 1].getID() < arrayHeap[childPos].getID())) {
 					childPos++;
-				} 
+				}
 			}
 		}
 	}
@@ -221,20 +212,20 @@ class ERPatient_MaxPriorityQueue {
 		ERPatient tempERPatient = arrayHeap[indexOfElement1];
 		arrayHeap[indexOfElement1] = arrayHeap[indexOfElement2];
 		arrayHeap[indexOfElement2] = tempERPatient;
-		
-		//update hashmap
+
+		// update hashmap
 		patientIndexMap.replace(arrayHeap[indexOfElement1].getName(), indexOfElement1);
 		patientIndexMap.replace(arrayHeap[indexOfElement2].getName(), indexOfElement2);
 	}
-	
+
 	@Override
 	public String toString() {
 		String output = new String();
-		for(int i=1; i<=numOfPatients; i++) {
+		for (int i = 1; i <= numOfPatients; i++) {
 			output = output.concat(arrayHeap[i].getName());
-			output = output.concat(" " + arrayHeap[i].getPriority()+"\n");
+			output = output.concat(" " + arrayHeap[i].getPriority() + "\n");
 		}
-		
+
 		return output;
 	}
 }
@@ -242,7 +233,7 @@ class ERPatient_MaxPriorityQueue {
 // ERPatient bean class
 class ERPatient {
 	private static int nextPatientID = 0;
-	
+
 	private String patientName;
 	private int emergencyLevel;
 	private int patientID;
@@ -260,7 +251,7 @@ class ERPatient {
 	public int getPriority() {
 		return this.emergencyLevel;
 	}
-	
+
 	public int getID() {
 		return this.patientID;
 	}
