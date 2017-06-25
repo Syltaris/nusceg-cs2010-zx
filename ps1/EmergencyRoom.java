@@ -86,7 +86,7 @@ class EmergencyRoom {
 		// into your chosen data structure
 		//
 		// write your answer here
-
+		patientQueue.insert(new ERPatient(patientName, emergencyLvl));
 	}
 
 	// update_key/node
@@ -123,10 +123,32 @@ class EmergencyRoom {
 	}
 
 	class ERPatient_MaxPriorityQueue {
-		ERPatient[] arrayHeap;
+		private ERPatient[] arrayHeap;
+		private int numOfPatients;
 		
 		public ERPatient_MaxPriorityQueue(int heapSize) {
 			arrayHeap = new ERPatient[heapSize];
+			arrayHeap[0] = null; //SELF: necessary?
+			numOfPatients = 0;
+		}
+		
+		public void insert(ERPatient newPatient) {
+			//simply insert patient to root if 1st element, increment numOfPatients
+			//else, check if need shiftUp starting from last node
+			if(numOfPatients == 0) {
+				arrayHeap[++numOfPatients] = newPatient;
+			} else {
+				arrayHeap[++numOfPatients] = newPatient;
+				shiftUp(numOfPatients);
+			}
+		}
+		
+		public ERPatient extract_max() {
+			return null;
+		}
+		
+		public void update_key() {
+			
 		}
 	}
 	
