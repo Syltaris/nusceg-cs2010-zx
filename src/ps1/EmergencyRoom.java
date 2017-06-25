@@ -1,3 +1,4 @@
+package ps1;
 
 //Given the names of N patients admitted into the emergency room, their initial emergency level, and subsequent updates of their emergency level, determine which patient the only doctor on duty (we assume here there is only one) has to give his/her most attention to.
 //
@@ -121,91 +122,7 @@ class EmergencyRoom {
 
 		return ans;
 	}
-
-	class ERPatient_MaxPriorityQueue {
-		private ERPatient[] arrayHeap;
-		private int numOfPatients;
-		
-		public ERPatient_MaxPriorityQueue(int heapSize) {
-			arrayHeap = new ERPatient[heapSize];
-			arrayHeap[0] = null; //SELF: necessary?
-			numOfPatients = 0;
-		}
-		
-		public void insert(ERPatient newPatient) {
-			//simply insert patient to root if 1st element, increment numOfPatients
-			//else, check if need shiftUp starting from last node
-			if(numOfPatients == 0) {
-				arrayHeap[++numOfPatients] = newPatient;
-			} else {
-				arrayHeap[++numOfPatients] = newPatient;
-				
-				try {
-					shiftUp(numOfPatients);
-				} catch(Exception e) {
-					System.out.println(e);
-				}
-			}
-		}
-		
-		public ERPatient extract_max() {
-			return null;
-		}
-		
-		public void update_key() {
-			
-		}
-		
-		//helper methods
-		//check if parent of current node has lower priority level,
-		//if so, swap and check parent of updated node and repeat
-		//else, continue checking next node sequentially in descending index
-		private void shiftUp(int startPos) throws Exception {
-			//if at root or invalid pos
-			if(startPos <= 1) {
-				throw new Exception("invalid node index");
-			}
-			int currPos = startPos;
-			
-			while(currPos > 1) {
-				int parentPos = currPos/2; //if odd, will round down to correct pos
-				if(arrayHeap[parentPos].getPriority() < arrayHeap[currPos].getPriority()) {
-					swap(parentPos, currPos);
-				}
-			}
-		}
-		
-		//receives 2 indexes of ERPatient to be swapped in arrayHeap and swaps them
-		private void swap(int indexOfElement1, int indexOfElement2) {
-			ERPatient tempERPatient= arrayHeap[indexOfElement1];
-			arrayHeap[indexOfElement1] = arrayHeap[indexOfElement2];
-			arrayHeap[indexOfElement2] = tempERPatient;
-		}
-	}
 	
-	// ERPatient bean class
-	class ERPatient {
-		private String patientName;
-		private int  emergencyLevel;
-
-		public ERPatient(String patientName, int emergencyLevel) {
-			this. emergencyLevel =  emergencyLevel;
-			this.patientName = patientName;
-		}
-
-		public String getName() {
-			return this.patientName;
-		}
-
-		public int getPriority() {
-			return this.emergencyLevel;
-		}
-
-		public void setPriority(int  emergencyLevel) {
-			this. emergencyLevel =  emergencyLevel;
-		}
-	}
-
 	void run() throws Exception {
 		// do not alter this method
 
@@ -238,5 +155,89 @@ class EmergencyRoom {
 		// do not alter this method
 		EmergencyRoom ps1 = new EmergencyRoom();
 		ps1.run();
+	}
+}
+
+class ERPatient_MaxPriorityQueue {
+	private ERPatient[] arrayHeap;
+	private int numOfPatients;
+	
+	public ERPatient_MaxPriorityQueue(int heapSize) {
+		arrayHeap = new ERPatient[heapSize];
+		arrayHeap[0] = null; //SELF: necessary?
+		numOfPatients = 0;
+	}
+	
+	public void insert(ERPatient newPatient) {
+		//simply insert patient to root if 1st element, increment numOfPatients
+		//else, add patient to end of heap, check if need shiftUp starting from last node
+		if(numOfPatients == 0) {
+			arrayHeap[++numOfPatients] = newPatient;
+		} else {
+			arrayHeap[++numOfPatients] = newPatient;
+			
+			try {
+				shiftUp(numOfPatients);
+			} catch(Exception e) {
+				System.out.println(e);
+			}
+		}
+	}
+	
+	public ERPatient extract_max() {
+		return null;
+	}
+	
+	public void update_key() {
+		
+	}
+	
+	//helper methods
+	//check if parent of current node has lower priority level,
+	//if so, swap and check parent of updated node and repeat
+	//else, continue checking next node sequentially in descending index
+	private void shiftUp(int startPos) throws Exception {
+		//if at root or invalid pos
+		if(startPos <= 1) {
+			throw new Exception("invalid node index");
+		}
+		int currPos = startPos;
+		int parentPos = currPos/2;
+		
+		while(currPos > 1 && (arrayHeap[parentPos].getPriority() < arrayHeap[currPos].getPriority())) {
+			swap(parentPos, currPos);
+			currPos = parentPos;
+			parentPos = currPos/2; //if odd, will round down to correct pos
+		}
+	}
+	
+	//receives 2 indexes of ERPatient to be swapped in arrayHeap and swaps them
+	private void swap(int indexOfElement1, int indexOfElement2) {
+		ERPatient tempERPatient= arrayHeap[indexOfElement1];
+		arrayHeap[indexOfElement1] = arrayHeap[indexOfElement2];
+		arrayHeap[indexOfElement2] = tempERPatient;
+	}
+}
+
+// ERPatient bean class
+class ERPatient {
+	private String patientName;
+	private int  emergencyLevel;
+
+	public ERPatient(String patientName, int emergencyLevel) {
+		this. emergencyLevel =  emergencyLevel;
+		this.patientName = patientName;
+	}
+
+	public String getName() {
+		return this.patientName;
+	}
+
+	public int getPriority() {
+		return this.emergencyLevel;
+	}
+
+	public void setPriority(int  emergencyLevel) {
+		this. emergencyLevel =  emergencyLevel;
 	}
 }
