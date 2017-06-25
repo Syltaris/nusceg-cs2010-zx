@@ -1,4 +1,4 @@
-package ps1;
+//package ps1;
 
 import java.util.*;
 import java.io.*;
@@ -179,9 +179,13 @@ class ERPatient_MaxPriorityQueue {
 		int currPos = startPos;
 		int childPos = currPos * 2; // left child of current parent
 
-		// find larger element of the 2 children
-		if (!(childPos >= numOfPatients) && (arrayHeap[childPos + 1].getPriority() > arrayHeap[childPos].getPriority())) {
-			childPos++;
+		// find larger element of the 2 children, if same priority, find earlier patient
+		if (!(childPos >= numOfPatients)) {
+			if(arrayHeap[childPos + 1].getPriority() > arrayHeap[childPos].getPriority() 
+					|| ((arrayHeap[childPos + 1].getPriority() == arrayHeap[childPos].getPriority()) 
+					&& arrayHeap[childPos + 1].getID() < arrayHeap[childPos].getID())) {
+				childPos++;
+			} 
 		}
 		
 		while ((childPos <= numOfPatients) && (arrayHeap[childPos].getPriority() >= arrayHeap[currPos].getPriority())) {
@@ -195,8 +199,12 @@ class ERPatient_MaxPriorityQueue {
 			currPos = childPos;
 			childPos = currPos * 2; // if odd, will round down to correct pos
 			
-			if (!(childPos >= numOfPatients) && (arrayHeap[childPos + 1].getPriority() > arrayHeap[childPos].getPriority())) {
-				childPos++;
+			if (!(childPos >= numOfPatients)) {
+				if(arrayHeap[childPos + 1].getPriority() > arrayHeap[childPos].getPriority() 
+						|| ((arrayHeap[childPos + 1].getPriority() == arrayHeap[childPos].getPriority()) 
+						&& arrayHeap[childPos + 1].getID() < arrayHeap[childPos].getID())) {
+					childPos++;
+				} 
 			}
 		}
 	}
