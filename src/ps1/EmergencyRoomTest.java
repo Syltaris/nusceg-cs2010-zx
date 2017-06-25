@@ -24,7 +24,7 @@ public class EmergencyRoomTest {
 		
 //		String testInput = "15\n0 GRACE 31\n0 THOMAS 55\n0 MARIA 42\n3\n0 CINDY 77\n3\n1 GRACE 24\n2 CINDY\n3\n2 MARIA\n3\n2 GRACE\n3\n2 THOMAS\n3";
 		
-		File testFile = new File("D:\\Repos\\cs2010-zx\\src\\ps1\\test2.txt");
+		File testFile = new File("D:\\Repos\\cs2010-zx\\src\\ps1\\test3.txt");
 		
 		BufferedReader br = null;
 		try {
@@ -35,9 +35,9 @@ public class EmergencyRoomTest {
 		}
 		PrintWriter pr = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out)));
 		
-		int numCMD = 0;
+		int allCMD = 0;
 		try {
-			numCMD = Integer.parseInt(br.readLine());
+			allCMD = Integer.parseInt(br.readLine());
 		} catch (NumberFormatException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -45,7 +45,9 @@ public class EmergencyRoomTest {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} // note that numCMD is >=
-														// N
+						
+		
+		int numCMD = allCMD++;// N
 		while (numCMD-- > 0) {
 			StringTokenizer st;
 			try {
@@ -71,7 +73,7 @@ public class EmergencyRoomTest {
 				e.printStackTrace();
 			}
 			
-			System.out.println((26-numCMD) + ps1.showQueue());
+			System.out.println((allCMD-numCMD) + ps1.showQueue());
 		}
 		pr.close();
 	}
