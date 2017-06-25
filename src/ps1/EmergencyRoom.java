@@ -1,4 +1,4 @@
-
+package ps1;
 
 import java.util.*;
 import java.io.*;
@@ -11,11 +11,11 @@ import java.io.*;
 class EmergencyRoom {
 	// if needed, declare a private data structure here that
 	// is accessible to all methods in this class
-	private static final int MAX_EMERGENCY_LEVEL = 100;
+	private static final int MAX_EMERGENCY_LEVEL = 200000;
 	private ERPatient_MaxPriorityQueue patientQueue;
 
 	public EmergencyRoom() {
-		this.patientQueue = new ERPatient_MaxPriorityQueue(MAX_EMERGENCY_LEVEL);
+		this.patientQueue = new ERPatient_MaxPriorityQueue(MAX_EMERGENCY_LEVEL+1);
 	}
 
 	void ArriveAtHospital(String patientName, int emergencyLvl) {
@@ -27,8 +27,12 @@ class EmergencyRoom {
 	}
 
 	void Treat(String patientName) {
-		patientQueue.update_key(patientName, MAX_EMERGENCY_LEVEL);
-		patientQueue.extract_max();
+		try {		
+			patientQueue.update_key(patientName, MAX_EMERGENCY_LEVEL);
+			patientQueue.extract_max();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	// if null, don't change ans
@@ -109,12 +113,16 @@ class ERPatient_MaxPriorityQueue {
 		}
 	}
 
-	public ERPatient extract_max() {
+	public ERPatient extract_max() throws Exception {
 		ERPatient outputPatient = arrayHeap[1];
 
-		// if left 1 patient, just return last patient and lazy delete root
+		if(numOfPatients <= 0) {
+			throw new Exception("invalid array index");
+		}
+		
 		if (numOfPatients == 1) {
-			return arrayHeap[numOfPatients--];
+			return arrayHeap[numOfPatients--]; 	// if left 1 patient, just return last patient and lazy delete root	
+
 		} else {
 			arrayHeap[1] = arrayHeap[numOfPatients--]; // lazy delete of last
 														// node, put to root
@@ -155,7 +163,7 @@ class ERPatient_MaxPriorityQueue {
 		int currPos = startPos;
 		int parentPos = currPos / 2;
 
-		while ((currPos > 1) && (arrayHeap[parentPos].getPriority() <= arrayHeap[currPos].getPriority())) {
+		while ((parentPos > 0) && (arrayHeap[parentPos].getPriority() <= arrayHeap[currPos].getPriority())) {
 			//if same emergency level but curr patient came later than parent patient
 			if(arrayHeap[parentPos].getPriority() == arrayHeap[currPos].getPriority()
 					&& arrayHeap[parentPos].getID() < arrayHeap[currPos].getID()) {
@@ -172,11 +180,11 @@ class ERPatient_MaxPriorityQueue {
 		int childPos = currPos * 2; // left child of current parent
 
 		// find larger element of the 2 children
-		if (arrayHeap[childPos + 1].getPriority() > arrayHeap[childPos].getPriority() && !(childPos >= numOfPatients)) {
+		if (!(childPos >= numOfPatients) && (arrayHeap[childPos + 1].getPriority() > arrayHeap[childPos].getPriority())) {
 			childPos++;
 		}
 		
-		while ((currPos < numOfPatients) && (arrayHeap[childPos].getPriority() >= arrayHeap[currPos].getPriority())) {
+		while ((childPos <= numOfPatients) && (arrayHeap[childPos].getPriority() >= arrayHeap[currPos].getPriority())) {
 			//if same emergency level but child came before curr patient
 			if(arrayHeap[childPos].getPriority() == arrayHeap[currPos].getPriority()
 					&& arrayHeap[childPos].getID() > arrayHeap[currPos].getID()) {
@@ -186,6 +194,10 @@ class ERPatient_MaxPriorityQueue {
 			swap(childPos, currPos);
 			currPos = childPos;
 			childPos = currPos * 2; // if odd, will round down to correct pos
+			
+			if (!(childPos >= numOfPatients) && (arrayHeap[childPos + 1].getPriority() > arrayHeap[childPos].getPriority())) {
+				childPos++;
+			}
 		}
 	}
 
