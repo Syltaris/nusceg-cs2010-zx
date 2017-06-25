@@ -1,4 +1,4 @@
-//package ps1;
+package ps1;
 
 import java.util.*;
 import java.io.*;
@@ -11,7 +11,7 @@ import java.io.*;
 class EmergencyRoom {
 	// if needed, declare a private data structure here that
 	// is accessible to all methods in this class
-	private static final int MAX_EMERGENCY_LEVEL = 200000;
+	static final int MAX_EMERGENCY_LEVEL = 200000;
 	private ERPatient_MaxPriorityQueue patientQueue;
 
 	public EmergencyRoom() {
@@ -88,12 +88,14 @@ class EmergencyRoom {
 
 class ERPatient_MaxPriorityQueue {
 	private ERPatient[] arrayHeap;
+	private HashMap<String, Integer> patientIndexMap;
 	private int numOfPatients;
 
 	public ERPatient_MaxPriorityQueue(int heapSize) {
-		arrayHeap = new ERPatient[heapSize];
-		arrayHeap[0] = null; // SELF: necessary?
-		numOfPatients = 0;
+		this.arrayHeap = new ERPatient[heapSize];
+		this.arrayHeap[0] = null; // SELF: necessary?
+		this.patientIndexMap = new HashMap<String, Integer>(EmergencyRoom.MAX_EMERGENCY_LEVEL);
+		this.numOfPatients = 0;
 	}
 
 	public ERPatient peek() {
@@ -104,13 +106,15 @@ class ERPatient_MaxPriorityQueue {
 		// simply insert patient to root if 1st element, increment numOfPatients
 		// else, add patient to end of heap, check if need shiftUp starting from
 		// last node
-		if (numOfPatients == 0) {
+//		if (numOfPatients == 0) {
+//			arrayHeap[++numOfPatients] = newPatient;
+//			patientIndexMap.put(newPatient.getName(), numOfPatients);
+//		} else {
 			arrayHeap[++numOfPatients] = newPatient;
-		} else {
-			arrayHeap[++numOfPatients] = newPatient;
+			patientIndexMap.put(newPatient.getName(), numOfPatients);
 
 			shiftUp(numOfPatients);
-		}
+//		}
 	}
 
 	public ERPatient extract_max() throws Exception {
@@ -121,11 +125,12 @@ class ERPatient_MaxPriorityQueue {
 		}
 		
 		if (numOfPatients == 1) {
+			patientIndexMap.remove(arrayHeap[numOfPatients].getName());
 			return arrayHeap[numOfPatients--]; 	// if left 1 patient, just return last patient and lazy delete root	
-
 		} else {
-			arrayHeap[1] = arrayHeap[numOfPatients--]; // lazy delete of last
-														// node, put to root
+			arrayHeap[1] = arrayHeap[numOfPatients--]; // lazy delete of last node, put to root
+			patientIndexMap.replace(arrayHeap[1].getName(), 1);
+			
 			shiftDown(1);
 		}
 
@@ -133,16 +138,18 @@ class ERPatient_MaxPriorityQueue {
 	}
 
 	public void update_key(String patientName, int incEmergencyLvl) {
-		int currPos = 0;
+		int currPos = patientIndexMap.get(patientName);
+		arrayHeap[currPos].setPriority(arrayHeap[currPos].getPriority() + incEmergencyLvl);
+
 		
-		for(int i = 1; i <= numOfPatients; i++) {
-			//find patient and update priorityLevel
-			if(arrayHeap[i].getName().equals(patientName)) {
-				arrayHeap[i].setPriority(arrayHeap[i].getPriority() + incEmergencyLvl);
-				currPos = i;
-				break;
-			}
-		}
+//		for(int i = 1; i <= numOfPatients; i++) {
+//			//find patient and update priorityLevel
+//			if(arrayHeap[i].getName().equals(patientName)) {
+//				arrayHeap[i].setPriority(arrayHeap[i].getPriority() + incEmergencyLvl);
+//				currPos = i;
+//				break;
+//			}
+//		}
 		//shift-up if curr node bigger than parent node
 		//else shift down
 		if(currPos<=1) {
@@ -214,6 +221,10 @@ class ERPatient_MaxPriorityQueue {
 		ERPatient tempERPatient = arrayHeap[indexOfElement1];
 		arrayHeap[indexOfElement1] = arrayHeap[indexOfElement2];
 		arrayHeap[indexOfElement2] = tempERPatient;
+		
+		//update hashmap
+		patientIndexMap.replace(arrayHeap[indexOfElement1].getName(), indexOfElement1);
+		patientIndexMap.replace(arrayHeap[indexOfElement2].getName(), indexOfElement2);
 	}
 	
 	@Override
