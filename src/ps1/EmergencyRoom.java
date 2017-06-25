@@ -97,7 +97,7 @@ class EmergencyRoom {
 		// and modify your chosen data structure (if needed)
 		//
 		// write your answer here
-
+		patientQueue.update_key(patientName, incEmergencyLvl);
 	}
 
 	// extract_max
@@ -106,6 +106,9 @@ class EmergencyRoom {
 		// remove him/her from your chosen data structure
 		//
 		// write your answer here
+		patientQueue.update_key(patientName, 100);
+		ERPatient nextPatient = patientQueue.extract_max();
+		System.out.println(nextPatient.getName());
 
 	}
 
@@ -119,10 +122,14 @@ class EmergencyRoom {
 		// be taken care of, return a String "The emergency room is empty"
 		//
 		// write your answer here
+		ERPatient nextPatient = patientQueue.peek();
+		if(nextPatient != null) {
+			ans = nextPatient.getName();
+		}
 
 		return ans;
 	}
-	
+
 	void run() throws Exception {
 		// do not alter this method
 
@@ -161,71 +168,124 @@ class EmergencyRoom {
 class ERPatient_MaxPriorityQueue {
 	private ERPatient[] arrayHeap;
 	private int numOfPatients;
-	
+
 	public ERPatient_MaxPriorityQueue(int heapSize) {
 		arrayHeap = new ERPatient[heapSize];
-		arrayHeap[0] = null; //SELF: necessary?
+		arrayHeap[0] = null; // SELF: necessary?
 		numOfPatients = 0;
+	}
+
+	public ERPatient peek() {
+		return arrayHeap[1];
 	}
 	
 	public void insert(ERPatient newPatient) {
-		//simply insert patient to root if 1st element, increment numOfPatients
-		//else, add patient to end of heap, check if need shiftUp starting from last node
-		if(numOfPatients == 0) {
+		// simply insert patient to root if 1st element, increment numOfPatients
+		// else, add patient to end of heap, check if need shiftUp starting from
+		// last node
+		if (numOfPatients == 0) {
 			arrayHeap[++numOfPatients] = newPatient;
 		} else {
 			arrayHeap[++numOfPatients] = newPatient;
-			
-			try {
-				shiftUp(numOfPatients);
-			} catch(Exception e) {
-				System.out.println(e);
+
+			shiftUp(numOfPatients);
+		}
+	}
+
+	public ERPatient extract_max() {
+		ERPatient outputPatient = arrayHeap[1];
+
+		// if left 1 patient, just return last patient and lazy delete root
+		if (numOfPatients == 1) {
+			return arrayHeap[numOfPatients--];
+		} else {
+			arrayHeap[1] = arrayHeap[numOfPatients--]; // lazy delete of last
+														// node, put to root
+			shiftDown(1);
+		}
+
+		return outputPatient;
+	}
+
+	public void update_key(String patientName, int incEmergencyLvl) {
+		int currPos = 0;
+		
+		for(int i = 1; i<numOfPatients; i++) {
+			//find patient and update priorityLevel
+			if(arrayHeap[i].getName().equals(patientName)) {
+				arrayHeap[i].setPriority(incEmergencyLvl);
+				currPos = i;
+				break;
 			}
 		}
-	}
-	
-	public ERPatient extract_max() {
-		return null;
-	}
-	
-	public void update_key() {
 		
-	}
-	
-	//helper methods
-	//check if parent of current node has lower priority level,
-	//if so, swap and check parent of updated node and repeat
-	//else, continue checking next node sequentially in descending index
-	private void shiftUp(int startPos) throws Exception {
-		//if at root or invalid pos
-		if(startPos <= 1) {
-			throw new Exception("invalid node index");
+		//shift-up if curr node bigger than parent node
+		//else shift down
+		if(arrayHeap[currPos/2].getPriority() < arrayHeap[currPos].getPriority()) {
+			shiftUp(currPos);
+		} else {
+			shiftDown(currPos);
 		}
+	}
+
+	// helper methods
+	// check if parent of current node has lower priority level,
+	// if so, swap and check parent of updated node and repeat
+	// else, continue checking next node sequentially in descending index
+	private void shiftUp(int startPos) {
 		int currPos = startPos;
-		int parentPos = currPos/2;
-		
-		while(currPos > 1 && (arrayHeap[parentPos].getPriority() < arrayHeap[currPos].getPriority())) {
+		int parentPos = currPos / 2;
+
+		while (currPos > 1 && (arrayHeap[parentPos].getPriority() < arrayHeap[currPos].getPriority())) {
 			swap(parentPos, currPos);
 			currPos = parentPos;
-			parentPos = currPos/2; //if odd, will round down to correct pos
+			parentPos = currPos / 2; // if odd, will round down to correct pos
 		}
 	}
-	
-	//receives 2 indexes of ERPatient to be swapped in arrayHeap and swaps them
+
+	private void shiftDown(int startPos) {
+		int currPos = startPos;
+		int childPos = currPos / 2; // left child of current parent
+
+		// find larger element of the 2 children
+		if (arrayHeap[childPos + 1].getPriority() > arrayHeap[childPos].getPriority() && !(childPos >= numOfPatients)) {
+			childPos++;
+		}
+
+		while (currPos < numOfPatients && (arrayHeap[childPos].getPriority() < arrayHeap[currPos].getPriority())) {
+			swap(childPos, currPos);
+			currPos = childPos;
+			childPos = currPos * 2; // if odd, will round down to correct pos
+		}
+	}
+
+	// receives 2 indexes of ERPatient to be swapped in arrayHeap and swaps them
 	private void swap(int indexOfElement1, int indexOfElement2) {
-		ERPatient tempERPatient= arrayHeap[indexOfElement1];
+		ERPatient tempERPatient = arrayHeap[indexOfElement1];
 		arrayHeap[indexOfElement1] = arrayHeap[indexOfElement2];
 		arrayHeap[indexOfElement2] = tempERPatient;
+	}
+
+	@Override
+	public String toString() {
+		String outputString = new String();
+
+		for (int i = 1; i <= numOfPatients; i++) {
+			outputString = outputString.concat(arrayHeap[i].getName());
+			outputString = outputString.concat(" " + arrayHeap[i].getPriority() + "\n");
+		}
+
+		return outputString;
 	}
 }
 
 // ERPatient bean class
 class ERPatient {
 	private String patientName;
-	private int  emergencyLevel;
+	private int emergencyLevel;
 
 	public ERPatient(String patientName, int emergencyLevel) {
-		this. emergencyLevel =  emergencyLevel;
+		this.emergencyLevel = emergencyLevel;
 		this.patientName = patientName;
 	}
 
@@ -237,7 +297,7 @@ class ERPatient {
 		return this.emergencyLevel;
 	}
 
-	public void setPriority(int  emergencyLevel) {
-		this. emergencyLevel =  emergencyLevel;
+	public void setPriority(int emergencyLevel) {
+		this.emergencyLevel = emergencyLevel;
 	}
 }
