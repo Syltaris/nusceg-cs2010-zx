@@ -57,7 +57,6 @@
 //    Query()
 //    You have to answer: "The emergency room is empty".
 
-
 // Copy paste this Java Template and save it as "EmergencyRoom.java"
 import java.util.*;
 import java.io.*;
@@ -68,113 +67,123 @@ import java.io.*;
 // year 2017 hash code: oIxT79fEI2IQdQqvg1rx (do NOT delete this line)
 
 class EmergencyRoom {
-  // if needed, declare a private data structure here that
-  // is accessible to all methods in this class
+	// if needed, declare a private data structure here that
+	// is accessible to all methods in this class
+	private static final int MAX_EMERGENCY_LEVEL = 100;
+	private ERPatient_MaxPriorityQueue patientQueue;
 
-//create array
-  public EmergencyRoom() {
-    // Write necessary code during construction
-    //
-    // write your answer here
+	// create array to fit all emergency levels 30-100
+	public EmergencyRoom() {
+		// Write necessary code during construction
+		//
+		// write your answer here
+		this.patientQueue = new ERPatient_MaxPriorityQueue(MAX_EMERGENCY_LEVEL);
+	}
 
+	// insert
+	void ArriveAtHospital(String patientName, int emergencyLvl) {
+		// You have to insert the information (patientName, emergencyLvl)
+		// into your chosen data structure
+		//
+		// write your answer here
 
+	}
 
-  }
+	// update_key/node
+	void UpdateEmergencyLvl(String patientName, int incEmergencyLvl) {
+		// You have to update the emergencyLvl of patientName to
+		// emergencyLvl += incEmergencyLvl
+		// and modify your chosen data structure (if needed)
+		//
+		// write your answer here
 
-  //insert
-  void ArriveAtHospital(String patientName, int emergencyLvl) {
-    // You have to insert the information (patientName, emergencyLvl)
-    // into your chosen data structure
-    //
-    // write your answer here
+	}
 
+	// extract_max
+	void Treat(String patientName) {
+		// This patientName is treated by the doctor
+		// remove him/her from your chosen data structure
+		//
+		// write your answer here
 
+	}
 
-  }
+	// if null, don't change ans
+	String Query() {
+		String ans = "The emergency room is empty";
 
-  //update_key/node
-  void UpdateEmergencyLvl(String patientName, int incEmergencyLvl) {
-    // You have to update the emergencyLvl of patientName to
-    // emergencyLvl += incEmergencyLvl
-    // and modify your chosen data structure (if needed)
-    //
-    // write your answer here
+		// You have to report the name of the patient that the doctor
+		// has to give the most attention to currently. If there is no more
+		// patient to
+		// be taken care of, return a String "The emergency room is empty"
+		//
+		// write your answer here
 
+		return ans;
+	}
 
-
-  }
-
-  //extract_max
-  void Treat(String patientName) {
-    // This patientName is treated by the doctor
-    // remove him/her from your chosen data structure
-    //
-    // write your answer here
-
-
-
-  }
-
-  //if null, don't change ans
-  String Query() {
-    String ans = "The emergency room is empty";
-
-    // You have to report the name of the patient that the doctor
-    // has to give the most attention to currently. If there is no more patient to
-    // be taken care of, return a String "The emergency room is empty"
-    //
-    // write your answer here
-
-
-
-    return ans;
-  }
-
-	//ERPatient bean class
+	class ERPatient_MaxPriorityQueue {
+		ERPatient[] arrayHeap;
+		
+		public ERPatient_MaxPriorityQueue(int heapSize) {
+			arrayHeap = new ERPatient[heapSize];
+		}
+	}
+	
+	// ERPatient bean class
 	class ERPatient {
-		private int priorityLevel;
-		private String name;
+		private String patientName;
+		private int  emergencyLevel;
 
-		public ERPatient(int priorityLevel, String name) {
-			this.priorityLevel = priorityLevel;
-			this.name = name;
+		public ERPatient(String patientName, int emergencyLevel) {
+			this. emergencyLevel =  emergencyLevel;
+			this.patientName = patientName;
 		}
 
 		public String getName() {
-			return this.name;
+			return this.patientName;
 		}
 
 		public int getPriority() {
-			return this.priorityLevel;
+			return this.emergencyLevel;
 		}
 
-		public void setPriority(int newPriorityLevel) {
-			this.priorityLevel = newPriorityLevel;
+		public void setPriority(int  emergencyLevel) {
+			this. emergencyLevel =  emergencyLevel;
 		}
 	}
-  
-  void run() throws Exception {
-    // do not alter this method
 
-    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    PrintWriter pr = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out)));
-    int numCMD = Integer.parseInt(br.readLine()); // note that numCMD is >= N
-    while (numCMD-- > 0) {
-      StringTokenizer st = new StringTokenizer(br.readLine());
-      int command = Integer.parseInt(st.nextToken());
-      switch (command) {
-        case 0: ArriveAtHospital(st.nextToken(), Integer.parseInt(st.nextToken())); break;
-        case 1: UpdateEmergencyLvl(st.nextToken(), Integer.parseInt(st.nextToken())); break;
-        case 2: Treat(st.nextToken()); break;
-        case 3: pr.println(Query()); break;
-      }
-    }
-    pr.close();
-  }
+	void run() throws Exception {
+		// do not alter this method
 
-  public static void main(String[] args) throws Exception {
-    // do not alter this method
-    EmergencyRoom ps1 = new EmergencyRoom();
-    ps1.run();
-  }
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		PrintWriter pr = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out)));
+		int numCMD = Integer.parseInt(br.readLine()); // note that numCMD is >=
+														// N
+		while (numCMD-- > 0) {
+			StringTokenizer st = new StringTokenizer(br.readLine());
+			int command = Integer.parseInt(st.nextToken());
+			switch (command) {
+			case 0:
+				ArriveAtHospital(st.nextToken(), Integer.parseInt(st.nextToken()));
+				break;
+			case 1:
+				UpdateEmergencyLvl(st.nextToken(), Integer.parseInt(st.nextToken()));
+				break;
+			case 2:
+				Treat(st.nextToken());
+				break;
+			case 3:
+				pr.println(Query());
+				break;
+			}
+		}
+		pr.close();
+	}
+
+	public static void main(String[] args) throws Exception {
+		// do not alter this method
+		EmergencyRoom ps1 = new EmergencyRoom();
+		ps1.run();
+	}
 }
