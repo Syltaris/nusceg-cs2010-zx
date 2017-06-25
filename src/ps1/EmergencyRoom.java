@@ -1,64 +1,5 @@
-package ps1;
 
-//Given the names of N patients admitted into the emergency room, their initial emergency level, and subsequent updates of their emergency level, determine which patient the only doctor on duty (we assume here there is only one) has to give his/her most attention to.
-//
-//A patient with higher emergency level will have higher priority. If there are more than one patient with the same highest emergency level, this only doctor will give priority to the patient who arrived at the hospital earlier.
-//
-//The skeleton program EmergencyRoom.java (click to view) that can handle all input/output details is already written for you.
-//
-//You just need to implement four more methods/functions:
-//
-//    void ArriveAtHospital(String patientName, int emergencyLvl)
-//    Insert this patientName and his/her initial emergency level (emergencyLvl) upon arrival at hospital into a suitable data structure of your choice.
-//    patientName is a String that contains only uppercase alphabets with length between 1 to 15 characters.
-//    The patient names are all unique.
-//    emergency level is an integer between [30..100].
-//    void UpdateEmergencyLvl(String patientName, int incEmergencyLvl)
-//    emergency level can only go up to emergencyLvl = 100 and our test data will ensure that this method will not cause a patientName to have emergency level greater than 100.
-//    What we guarantee is that incEmergencyLvl is an integer between [0..70] and before calling this method, patientName has arrived at the hospital.
-//    void Treat(String patientName)
-//    Upon calling this method, we assume the patientName will have been treated by the doctore and no longer need to be in the emergency room.
-//    We guarantee that before calling this method, patientName has arrived at the hospital.
-//    String Query() Query your data structure and report the name of the patient that the only doctor on duty has to give the most attention to.
-//    See the priority criteria defined above.
-//    If there is no more patient to be taken care of, return a String: "The emergency room is empty".
-//
-//Example:
-//Let the chronological sequence of 15 events be as follows:
-//
-//    ArriveAtHospital("GRACE", 31)
-//    ArriveAtHospital("THOMAS", 55)
-//    ArriveAtHospital("MARIA", 42)
-//    Query()
-//    You have to print out "THOMAS", as he is currently the one with the highest emergency level.
-//    To be precise, at the moment the order is: (THOMAS, 55), (MARIA, 42), (GRACE, 31).
-//    ArriveAtHospital("CINDY", 77)
-//    Query()
-//    Now you have to print out "CINDY".
-//    The current order is: (CINDY, 77), (THOMAS, 55), (MARIA, 42), (GRACE, 31).
-//    UpdateEmergencyLvl("GRACE", 24)
-//    After this event, the one with the highest emergency is still CINDY with emergencyLvl = 77.
-//    "GRACE" now has emergencyLvl = 31+24 = 55, but this is still smaller than "CINDY".
-//    Note that "THOMAS" also has emergencyLvl = 55 but "GRACE" is in front of "THOMAS" because "GRACE" arrived at the hospital earlier.
-//    The current order is: (CINDY, 77), (GRACE, 55), (THOMAS, 55), (MARIA, 42).
-//    Treat("CINDY")
-//    "CINDY" is now treated by the doctor 'instantly', and she will be removed from the emergency room.
-//    Query()
-//    Now you have to print out "GRACE", as the current order is: (GRACE, 55), (THOMAS, 55), (MARIA, 42).
-//    Treat("MARIA")
-//    For whatever reasons "MARIA" suddenly reaches an emergency level of 100 and is treated by the doctor. She will now be removed from the emergency room.
-//    Query()
-//    The answer is still: "GRACE".
-//    The current order is: (GRACE, 55), (THOMAS, 55).
-//    Treat("GRACE")
-//    Query()
-//    You have to answer: "THOMAS".
-//    The current order is: (THOMAS, 55).
-//    Treat("THOMAS")
-//    Query()
-//    You have to answer: "The emergency room is empty".
 
-// Copy paste this Java Template and save it as "EmergencyRoom.java"
 import java.util.*;
 import java.io.*;
 
@@ -86,30 +27,24 @@ class EmergencyRoom {
 	}
 
 	void Treat(String patientName) {
-		// This patientName is treated by the doctor
-		// remove him/her from your chosen data structure
-		//
-		// write your answer here
 		patientQueue.update_key(patientName, MAX_EMERGENCY_LEVEL);
-		ERPatient nextPatient = patientQueue.extract_max();
+		patientQueue.extract_max();
 	}
 
 	// if null, don't change ans
 	String Query() {
 		String ans = "The emergency room is empty";
 
-		// You have to report the name of the patient that the doctor
-		// has to give the most attention to currently. If there is no more
-		// patient to
-		// be taken care of, return a String "The emergency room is empty"
-		//
-		// write your answer here
 		ERPatient nextPatient = patientQueue.peek();
 		if(nextPatient != null) {
 			ans = nextPatient.getName();
 		}
 
 		return ans;
+	}
+	
+	public String showQueue() {
+		return patientQueue.toString();
 	}
 
 	void run() throws Exception {
@@ -158,7 +93,7 @@ class ERPatient_MaxPriorityQueue {
 	}
 
 	public ERPatient peek() {
-		return numOfPatients == 0? null : arrayHeap[1];
+		return numOfPatients == 0 ? null : arrayHeap[1];
 	}
 	
 	public void insert(ERPatient newPatient) {
@@ -205,9 +140,9 @@ class ERPatient_MaxPriorityQueue {
 		if(currPos<=1) {
 			return;
 		}
-		else if((arrayHeap[currPos/2].getPriority() < arrayHeap[currPos].getPriority())) {
+		else if((arrayHeap[currPos/2].getPriority() <= arrayHeap[currPos].getPriority())) {
 			shiftUp(currPos);
-		} else if(!(currPos*2 > numOfPatients)){
+		} else if(currPos*2 <= numOfPatients){
 			shiftDown(currPos);
 		}
 	}
@@ -220,7 +155,12 @@ class ERPatient_MaxPriorityQueue {
 		int currPos = startPos;
 		int parentPos = currPos / 2;
 
-		while (currPos > 1 && (arrayHeap[parentPos].getPriority() < arrayHeap[currPos].getPriority())) {
+		while ((currPos > 1) && (arrayHeap[parentPos].getPriority() <= arrayHeap[currPos].getPriority())) {
+			//if same emergency level but curr patient came later than parent patient
+			if(arrayHeap[parentPos].getPriority() == arrayHeap[currPos].getPriority()
+					&& arrayHeap[parentPos].getID() < arrayHeap[currPos].getID()) {
+				break;
+			}
 			swap(parentPos, currPos);
 			currPos = parentPos;
 			parentPos = currPos / 2; // if odd, will round down to correct pos
@@ -235,8 +175,14 @@ class ERPatient_MaxPriorityQueue {
 		if (arrayHeap[childPos + 1].getPriority() > arrayHeap[childPos].getPriority() && !(childPos >= numOfPatients)) {
 			childPos++;
 		}
-
-		while (currPos < numOfPatients && (arrayHeap[childPos].getPriority() < arrayHeap[currPos].getPriority())) {
+		
+		while ((currPos < numOfPatients) && (arrayHeap[childPos].getPriority() >= arrayHeap[currPos].getPriority())) {
+			//if same emergency level but child came before curr patient
+			if(arrayHeap[childPos].getPriority() == arrayHeap[currPos].getPriority()
+					&& arrayHeap[childPos].getID() > arrayHeap[currPos].getID()) {
+				break;
+			}
+			
 			swap(childPos, currPos);
 			currPos = childPos;
 			childPos = currPos * 2; // if odd, will round down to correct pos
@@ -249,16 +195,31 @@ class ERPatient_MaxPriorityQueue {
 		arrayHeap[indexOfElement1] = arrayHeap[indexOfElement2];
 		arrayHeap[indexOfElement2] = tempERPatient;
 	}
+	
+	@Override
+	public String toString() {
+		String output = new String();
+		for(int i=1; i<=numOfPatients; i++) {
+			output = output.concat(arrayHeap[i].getName());
+			output = output.concat(" " + arrayHeap[i].getPriority()+"\n");
+		}
+		
+		return output;
+	}
 }
 
 // ERPatient bean class
 class ERPatient {
+	private static int nextPatientID = 0;
+	
 	private String patientName;
 	private int emergencyLevel;
+	private int patientID;
 
 	public ERPatient(String patientName, int emergencyLevel) {
 		this.emergencyLevel = emergencyLevel;
 		this.patientName = patientName;
+		this.patientID = nextPatientID++;
 	}
 
 	public String getName() {
@@ -267,6 +228,10 @@ class ERPatient {
 
 	public int getPriority() {
 		return this.emergencyLevel;
+	}
+	
+	public int getID() {
+		return this.patientID;
 	}
 
 	public void setPriority(int emergencyLevel) {
