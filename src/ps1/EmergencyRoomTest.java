@@ -24,11 +24,16 @@ public class EmergencyRoomTest {
 		
 //		String testInput = "15\n0 GRACE 31\n0 THOMAS 55\n0 MARIA 42\n3\n0 CINDY 77\n3\n1 GRACE 24\n2 CINDY\n3\n2 MARIA\n3\n2 GRACE\n3\n2 THOMAS\n3";
 		
-		File testFile = new File("D:\\Repos\\cs2010-zx\\src\\ps1\\test3.txt");
+		File testFile = new File("D:\\Repos\\CS2010\\testcases\\ps1\\remove_boundary_case.in");
+		File outputFile = new File("D:\\Repos\\CS2010\\testcases\\ps1\\remove_boundary_case.out");
 		
 		BufferedReader br = null;
+		BufferedReader brout = null;
+
 		try {
 			br = new BufferedReader(new FileReader(testFile));
+			brout = new BufferedReader(new FileReader(outputFile));
+
 		} catch (FileNotFoundException e2) {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
@@ -65,7 +70,8 @@ public class EmergencyRoomTest {
 				ps1.Treat(st.nextToken());
 				break;
 			case 3:
-				pr.println(ps1.Query());
+//				pr.println(ps1.Query());
+				assertEquals(ps1.Query(), brout.readLine());
 				break;
 			}
 			} catch (IOException e) {
@@ -73,7 +79,7 @@ public class EmergencyRoomTest {
 				e.printStackTrace();
 			}
 			
-			System.out.println((allCMD-numCMD) + ps1.showQueue());
+//			System.out.println((allCMD-numCMD) + ps1.showQueue());
 		}
 		pr.close();
 	}
