@@ -15,6 +15,7 @@ class PatientNames {
 
 	// --------------------------------------------
 	Name_BST malePatientsList, femalePatientsList;
+	HashMap<String, Integer> patientsGenderMap;
 	// --------------------------------------------
 
 	public PatientNames() {
@@ -25,6 +26,7 @@ class PatientNames {
 		// --------------------------------------------
 		this.malePatientsList = new Name_BST();
 		this.femalePatientsList = new Name_BST();
+		this.patientsGenderMap = new HashMap<String, Integer>(20000); //20k patients
 		// --------------------------------------------
 	}
 
@@ -40,8 +42,7 @@ class PatientNames {
 		} else if(gender == 2) {
 			femalePatientsList.insert(patientName);
 		}
-		
-		
+		patientsGenderMap.put(patientName, gender);
 		// --------------------------------------------
 	}
 
@@ -51,7 +52,11 @@ class PatientNames {
 		// write your answer here
 
 		// --------------------------------------------
-		
+		if(patientsGenderMap.get(patientName) == 1) {
+			malePatientsList.delete(patientName);
+		} else {
+			femalePatientsList.delete(patientName);
+		}
 		// --------------------------------------------
 	}
 
