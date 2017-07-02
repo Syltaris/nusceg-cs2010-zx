@@ -1,6 +1,5 @@
 package ps22;
 
-//Copy paste this Java Template and save it as "PatientNames.java"
 import java.util.*;
 import java.io.*;
 
@@ -290,6 +289,13 @@ class Name_BST {
 		}
 		
 		Name_BSTVertex vertex_parent = vertex.getParent();
+		
+		//removing root
+		if(vertex_parent == null) {
+			replaceVertexWithSuccessor(vertex);
+			return;
+		}
+		
 		//removing leaves
 		if(vertex.getLeft() == null && vertex.getRight() == null) {
 			if(vertex_parent.getLeft() != null && vertex_parent.getLeft().equals(vertex)) {
@@ -299,24 +305,63 @@ class Name_BST {
 			}
 		} else if(vertex.getLeft() != null) {
 			vertex_parent.setLeft(vertex.getLeft()); //inherit left children
+			vertex.getLeft().setParent(vertex_parent);
 		} else if(vertex.getRight() != null) {
 			vertex_parent.setRight(vertex.getRight()); //inherit right children
+			vertex.getRight().setParent(vertex_parent);
 		} else {
 			//replace vertex with successor
-			Name_BSTVertex vertex_successor = null;
-			try {
-				vertex_successor = findSuccessor(vertex);
-			} catch (Exception e) {
-				e.printStackTrace();
+			replaceVertexWithSuccessor(vertex);
+		}
+	}
+	
+	private void replaceVertexWithSuccessor(Name_BSTVertex vertex) {
+		Name_BSTVertex vertex_successor = null;
+		try {
+			vertex_successor = findSuccessor(vertex);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		if(vertex.getParent() == null) {
+			this.root = vertex_successor;
+		}
+		
+		if((vertex_successor.getParent().getRight() != null && vertex_successor.getParent().getRight().equals(vertex_successor))) {
+			vertex_successor.setLeft(vertex_successor.getParent().getLeft());
+			
+			if(vertex_successor.getParent().getParent() != null) {
+				vertex_successor.getParent().getParent().setRight(vertex_successor);
+			}
+			vertex_successor.setParent(vertex_successor.getParent().getParent());
+
+		} else if(vertex_successor.getParent().getLeft() != null && vertex_successor.getParent().getLeft().equals(vertex_successor)){
+			vertex_successor.getParent().setLeft(vertex_successor.getRight());
+			if(vertex_successor.getRight() != null) {	
+				vertex_successor.getRight().setParent(vertex_successor.getParent());
 			}
 			
 			vertex_successor.setParent(vertex.getParent());
 			vertex_successor.setLeft(vertex.getLeft());
 			vertex_successor.setRight(vertex.getRight());
 			vertex_successor.setHeight(vertex.getHeight());
+			if(vertex.getLeft() != null) {
+				vertex.getLeft().setParent(vertex_successor);
+			}
+			if(vertex.getRight() != null) {
+				vertex.getRight().setParent(vertex_successor);
+			}
+			if(vertex.getParent() != null) {
+				if(vertex.getParent().getLeft().equals(vertex)) {
+					vertex.getParent().setLeft(vertex_successor);
+				} else {
+					vertex.getParent().setRight(vertex_successor);
+				}
+			}	
 		}
+
 	}
-	
+
 	public int getRankBySubstring(String keyword) {
 		int rank = 1;
 		Name_BSTVertex vertex = this.root;
