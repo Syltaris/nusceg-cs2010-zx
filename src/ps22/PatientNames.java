@@ -1,4 +1,4 @@
-package ps2;
+package ps22;
 
 //Copy paste this Java Template and save it as "PatientNames.java"
 import java.util.*;
@@ -14,7 +14,7 @@ class PatientNames {
 	// is accessible to all methods in this class
 
 	// --------------------------------------------
-
+	Name_BST malePatientsList, femalePatientsList;
 	// --------------------------------------------
 
 	public PatientNames() {
@@ -23,7 +23,8 @@ class PatientNames {
 		// write your answer here
 
 		// --------------------------------------------
-
+		this.malePatientsList = new Name_BST();
+		this.femalePatientsList = new Name_BST();
 		// --------------------------------------------
 	}
 
@@ -34,7 +35,13 @@ class PatientNames {
 		// write your answer here
 
 		// --------------------------------------------
-
+		if(gender == 1) {
+			malePatientsList.insert(patientName);
+		} else if(gender == 2) {
+			femalePatientsList.insert(patientName);
+		}
+		
+		
 		// --------------------------------------------
 	}
 
@@ -44,7 +51,7 @@ class PatientNames {
 		// write your answer here
 
 		// --------------------------------------------
-
+		
 		// --------------------------------------------
 	}
 
@@ -93,16 +100,30 @@ class PatientNames {
 		PatientNames ps2 = new PatientNames();
 		ps2.run();
 	}
+	
+	public Name_BST getMaleBST() {
+		return this.malePatientsList;
+	}
+	
+	public Name_BST getFemaleBST() {
+		return this.femalePatientsList;
+	}
 }
 
 class Name_BSTVertex implements Comparable<Name_BSTVertex> {
 	private Name_BSTVertex parent, left, right;
 	private String key_name;
 	private int height;
+	private int balance_factor;
 	private int size;
 
-	public Name_BSTVertex(String key_name) {
+	public Name_BSTVertex(String key_name, Name_BSTVertex parent) {
 		this.key_name = key_name;
+		this.parent = parent;
+		this.left = null;
+		this.right = null;
+		
+		this.height = 0; //assumption that vertex will always be leaf?
 	}
 
 	// getter/setter methods
@@ -121,7 +142,9 @@ class Name_BSTVertex implements Comparable<Name_BSTVertex> {
 	public int getHeight() {
 		return this.height;
 	}
-
+	public int getBalance_factor() {
+		return balance_factor;
+	}
 	public int getSize() {
 		return this.size;
 	}
@@ -141,15 +164,43 @@ class Name_BSTVertex implements Comparable<Name_BSTVertex> {
 	public void setHeight(int height) {
 		this.height = height;
 	}
-
+	public void setBalance_factor(int balance_factor) {
+		this.balance_factor = balance_factor;
+	}
 	public void setSize(int size) {
 		this.size = size;
 	}
+	
+	private int calculateBalanceFactor() {
+		int bf = 0;
+		if(this.getLeft() == null && this.getRight() == null) {
+			bf = -2;
+		} else if(this.getLeft() == null) {
+			bf = this.getRight().getHeight() + 1; // right - (-1)
+		} else if(this.getRight() == null) {
+			bf = this.getLeft().getHeight() + 1; //left - (-1)
+		} else {
+			bf = this.getLeft().getHeight() - this.getRight().getHeight();
+		}
+		
+		return Math.abs(bf);
+	}
+	
 
 	@Override
 	public int compareTo(Name_BSTVertex o) {
 		return this.key_name.compareTo(o.key_name);
 	}
+
+	@Override
+	public String toString() {
+		String output = new String();
+		
+		output = output.concat("NAME: " + key_name).concat(",HEIGHT: " + height).concat(",BF: " + balance_factor);
+		return output;
+	}
+
+
 }
 
 class Name_BST {
@@ -159,17 +210,19 @@ class Name_BST {
 		this.root = null;
 	}
 
-	public void insert(Name_BSTVertex node) {
+	public void insert(String name) {
+		Name_BSTVertex nodeToInsert = new Name_BSTVertex(name, null);
+		
 		if(this.root == null) {
-			root = node;
+			root = nodeToInsert;
 		} else {
 			//traverse left, else right
 			Name_BSTVertex vertex = null, vertex_parent = null;
 			
-			if(this.root.compareTo(node) < 0) {
-				vertex = this.root.getLeft();
-			} else if(this.root.compareTo(node) > 0) {
+			if(this.root.compareTo(nodeToInsert) < 0) {
 				vertex = this.root.getRight();
+			} else if(this.root.compareTo(nodeToInsert) > 0) {
+				vertex = this.root.getLeft();
 			} else {
 				System.out.println("EQUALS?"); //ERR
 			}
@@ -177,28 +230,31 @@ class Name_BST {
 			//find insertion point
 			while(vertex != null) {
 				//if node value is larger than curr vertex, continue going right, else go left
-				if(node.compareTo(vertex) < 0) {
+				if(vertex.compareTo(nodeToInsert) < 0) {
 					vertex_parent = vertex;
 					vertex = vertex.getRight();
-				} else if(node.compareTo(vertex) > 0) {
+				} else if(vertex.compareTo(nodeToInsert) > 0) {
 					vertex_parent = vertex;
 					vertex = vertex.getLeft();
 				}
 			}
-			
-			vertex = node;
-			
+
 			//insert node
-			if(vertex_parent.compareTo(node) < 0) {
-				vertex_parent.setRight(node);
+			if(vertex_parent.compareTo(nodeToInsert) < 0) {
+				vertex_parent.setRight(nodeToInsert);
 			} else {
-				vertex_parent.setLeft(node);
+				vertex_parent.setLeft(nodeToInsert);
 			}
+			nodeToInsert.setParent(vertex_parent);
 			
-			//init new vertex's links
-			vertex.setParent(vertex_parent);
-			vertex.setLeft(null);
-			vertex.setRight(null);
+			//update balance factor and height
+			while(vertex_parent != null) {
+				int currHeight = 1; //assume starting from leaf
+				
+				vertex_parent.setHeight(currHeight++);
+				vertex_parent = vertex_parent.getParent();
+			}
+			//check and rotate
 		}
 	}
 	
