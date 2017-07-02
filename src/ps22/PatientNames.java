@@ -69,7 +69,19 @@ class PatientNames {
 		// write your answer here
 
 		// --------------------------------------------
-		
+		if(gender == 0) {
+			System.out.println(malePatientsList.getRankBySubstring(END));
+			System.out.println(malePatientsList.getRankBySubstring(START));
+			System.out.println(femalePatientsList.getRankBySubstring(END));
+			System.out.println(femalePatientsList.getRankBySubstring(START));
+			
+			ans = (malePatientsList.getRankBySubstring(END) - malePatientsList.getRankBySubstring(START) 
+					+ femalePatientsList.getRankBySubstring(START) - femalePatientsList.getRankBySubstring(END));
+		} else if (gender == 1) {
+			ans = malePatientsList.getRankBySubstring(END) - malePatientsList.getRankBySubstring(START);
+		} else {
+			ans = femalePatientsList.getRankBySubstring(END) - femalePatientsList.getRankBySubstring(START);
+		}
 		// --------------------------------------------
 
 		return ans;
@@ -143,6 +155,10 @@ class Name_BSTVertex implements Comparable<Name_BSTVertex> {
 	public Name_BSTVertex getRight() {
 		return this.right;
 	}
+	
+	public String getName() {
+		return this.key_name;
+	}
 
 	public int getHeight() {
 		return this.height;
@@ -202,26 +218,31 @@ class Name_BSTVertex implements Comparable<Name_BSTVertex> {
 	public String toString() {
 		String output = new String();
 		
-		output = output.concat("NAME: " + key_name).concat(",HEIGHT: " + height).concat(",BF: " + balance_factor);
+		output = output.concat("NAME: " + key_name +",HEIGHT: " + height+",BF: " + balance_factor);
+		
 		return output;
 	}
 }
 
 class Name_BST {
 	private Name_BSTVertex root;
+	private HashMap<String, Integer> nameRankMapCache;
 
 	public Name_BST() {
 		this.root = null;
+		this.nameRankMapCache = new HashMap<String, Integer>();
 	}
 
 	public void insert(String name) {
+		this.nameRankMapCache.clear(); //invalidate cache
+		
 		Name_BSTVertex nodeToInsert = new Name_BSTVertex(name, null);
 		
 		if(this.root == null) {
 			root = nodeToInsert;
 		} else {
 			//traverse left, else right
-			Name_BSTVertex vertex = null, vertex_parent = null;
+			Name_BSTVertex vertex = null, vertex_parent = root;
 			
 			if(this.root.compareTo(nodeToInsert) < 0) {
 				vertex = this.root.getRight();
@@ -233,12 +254,11 @@ class Name_BST {
 			
 			//find insertion point
 			while(vertex != null) {
+				vertex_parent = vertex;
 				//if node value is larger than curr vertex, continue going right, else go left
 				if(vertex.compareTo(nodeToInsert) < 0) {
-					vertex_parent = vertex;
 					vertex = vertex.getRight();
 				} else if(vertex.compareTo(nodeToInsert) > 0) {
-					vertex_parent = vertex;
 					vertex = vertex.getLeft();
 				}
 			}
@@ -252,9 +272,8 @@ class Name_BST {
 			nodeToInsert.setParent(vertex_parent);
 			
 			//update balance factor and height going up the path from leaf to root
+			int currHeight = 1; //assume starting from leaf
 			while(vertex_parent != null) {
-				int currHeight = 1; //assume starting from leaf
-				
 				vertex_parent.setHeight(currHeight++);
 				vertex_parent = vertex_parent.getParent();
 			}
@@ -264,6 +283,8 @@ class Name_BST {
 	}
 		
 	public void delete(String name) {
+		this.nameRankMapCache.clear(); //invalidate cache
+		
 		Name_BSTVertex nodeToDelete = new Name_BSTVertex(name, null), vertex = this.root;
 		
 		//navigate to the node to be deleted
@@ -303,13 +324,54 @@ class Name_BST {
 		}
 	}
 	
+	public int getRankBySubstring(String keyword) {
+		int rank = -1;
+		Name_BSTVertex vertex = this.root;
+		
+		//while node is still lexicographically larger than keyword
+		while(vertex.getLeft() != null && vertex.getName().compareTo(keyword) > 0) {
+			vertex = vertex.getLeft();
+		}
+		//if found lexicographically smaller word, try going right subtree first if any
+		//untill next word is now lexicographically larger again
+		while(vertex.getRight() != null && vertex.getRight().getName().compareTo(keyword) < 0 ) {
+			vertex = vertex.getRight();
+		}
+		//traverse down left again until word is reached
+		while(vertex.getLeft() != null && vertex.getName().compareTo(keyword) > 0) {
+			vertex = vertex.getLeft();
+		}
+		
+		String patientNameToFind = vertex.getName();
+		
+		if(this.nameRankMapCache.containsKey(patientNameToFind)) {
+			rank = this.nameRankMapCache.get(patientNameToFind);
+		} else {
+			inorderTraversal(this.root, 1); //INEFFICIENT UPDATES ALL !!!!!!!!!!!!!!!!!!!!!
+			rank = this.nameRankMapCache.get(patientNameToFind);
+		}
+		
+		return rank;
+	}
+	
 	@Override
 	public String toString() {
 		String output = new String();
 		
 		//do inorder traversal
+		inorderTraversalPrint(this.root);
 		
 		return output;
+	}
+	
+	public int inorderTraversalPrint(Name_BSTVertex node) {
+		if(node == null) {
+			return -1;
+		}
+		
+		inorderTraversalPrint(node.getLeft()); //if came out from left child		
+		System.out.println("NODE IS:" + node);
+		return inorderTraversalPrint(node.getRight()); //pass on to the successor
 	}
 	
 	private Name_BSTVertex findSuccessor(Name_BSTVertex node) throws Exception {
@@ -376,5 +438,15 @@ class Name_BST {
 				return vertex_parent;
 			}
 		}
+	}
+	
+	//update all 
+	private int inorderTraversal(Name_BSTVertex node, int currRank) {
+		if(node == null) {
+			return currRank;
+		}
+		currRank = inorderTraversal(node.getLeft(), currRank); //if came out from left child
+		this.nameRankMapCache.put(node.getName(),  ++currRank);
+		return inorderTraversal(node.getRight(), currRank+1) + 1; //pass on to the successor
 	}
 }
