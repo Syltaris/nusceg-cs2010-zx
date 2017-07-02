@@ -75,12 +75,12 @@ class PatientNames {
 			System.out.println(femalePatientsList.getRankBySubstring(END));
 			System.out.println(femalePatientsList.getRankBySubstring(START));
 			
-			ans = (malePatientsList.getRankBySubstring(END) - malePatientsList.getRankBySubstring(START) 
+			ans = 2 + (malePatientsList.getRankBySubstring(END) - malePatientsList.getRankBySubstring(START) 
 					+ femalePatientsList.getRankBySubstring(START) - femalePatientsList.getRankBySubstring(END));
 		} else if (gender == 1) {
-			ans = malePatientsList.getRankBySubstring(END) - malePatientsList.getRankBySubstring(START);
+			ans = 1 + malePatientsList.getRankBySubstring(END) - malePatientsList.getRankBySubstring(START);
 		} else {
-			ans = femalePatientsList.getRankBySubstring(END) - femalePatientsList.getRankBySubstring(START);
+			ans = 1 + femalePatientsList.getRankBySubstring(END) - femalePatientsList.getRankBySubstring(START);
 		}
 		// --------------------------------------------
 
@@ -443,10 +443,12 @@ class Name_BST {
 	//update all 
 	private int inorderTraversal(Name_BSTVertex node, int currRank) {
 		if(node == null) {
-			return currRank;
+			return 0;
 		}
-		currRank = inorderTraversal(node.getLeft(), currRank); //if came out from left child
-		this.nameRankMapCache.put(node.getName(),  ++currRank);
-		return inorderTraversal(node.getRight(), currRank+1) + 1; //pass on to the successor
+		inorderTraversal(node.getLeft(), currRank); //if came out from left child
+		this.nameRankMapCache.put(node.getName(), currRank++);
+		inorderTraversal(node.getRight(), currRank); //pass on to the successor
+		
+		return currRank;
 	}
 }
