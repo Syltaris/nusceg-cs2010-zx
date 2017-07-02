@@ -284,6 +284,7 @@ class Name_BST {
 			vertex_parent.setRight(vertex.getRight()); //inherit right children
 		} else {
 			//replace vertex with successor
+			vertex = findSuccessor(vertex);
 		}
 	}
 	
@@ -294,5 +295,71 @@ class Name_BST {
 		//do inorder traversal
 		
 		return output;
+	}
+	
+	private Name_BSTVertex findSuccessor(Name_BSTVertex node) throws Exception {
+		Name_BSTVertex vertex = node, vertex_parent;
+		
+		//successor is in right subtree
+		if(vertex.getRight() != null) {
+			//if left is null, return this
+			//else traverse left until vertex's left child is null, return this
+			vertex = node.getRight();
+			
+			while(vertex.getLeft() != null) {
+				vertex = vertex.getLeft();
+			}
+			
+			return vertex;
+		} else { //succesor is parent or in parents' right subtree
+			vertex_parent = vertex.getParent();
+			
+			//traverse up and left of the tree from right(if so)
+			//until traverse up and right once
+			while(vertex_parent != null && vertex.equals(vertex_parent.getRight())) {
+				vertex = vertex_parent;
+				vertex_parent = vertex.getParent();
+			}
+			
+			//if root, return ERR
+			if(vertex_parent == null) {
+				throw new Exception("root is reached unexpectedly");
+			} else {
+				return vertex_parent;
+			}
+		}
+	}
+	
+	private Name_BSTVertex findPredeccessor(Name_BSTVertex node) throws Exception {
+		Name_BSTVertex vertex = node, vertex_parent;
+		
+		//successor is in left subtree
+		if(vertex.getLeft() != null) {
+			//if right is null, return this
+			//else traverse right until vertex's right child is null, return this
+			vertex = node.getLeft();
+			
+			while(vertex.getRight() != null) {
+				vertex = vertex.getRight();
+			}
+			
+			return vertex;
+		} else { //predecccesor is parent or in parents' left subtree
+			vertex_parent = vertex.getParent();
+			
+			//traverse up and right of the tree from left (if so)
+			//until traverse up and left once
+			while(vertex_parent != null && vertex.equals(vertex_parent.getLeft())) {
+				vertex = vertex_parent;
+				vertex_parent = vertex.getParent();
+			}
+			
+			//if root, return ERR
+			if(vertex_parent == null) {
+				throw new Exception("root is reached unexpectedly");
+			} else {
+				return vertex_parent;
+			}
+		}
 	}
 }
