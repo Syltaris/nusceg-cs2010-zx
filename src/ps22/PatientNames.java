@@ -70,10 +70,10 @@ class PatientNames {
 
 		// --------------------------------------------
 		if(gender == 0) {
-			System.out.println(malePatientsList.getRankBySubstring(END));
-			System.out.println(malePatientsList.getRankBySubstring(START));
-			System.out.println(femalePatientsList.getRankBySubstring(END));
-			System.out.println(femalePatientsList.getRankBySubstring(START));
+//			System.out.println(malePatientsList.getRankBySubstring(END));
+//			System.out.println(malePatientsList.getRankBySubstring(START));
+//			System.out.println(femalePatientsList.getRankBySubstring(END));
+//			System.out.println(femalePatientsList.getRankBySubstring(START));
 			
 			ans = 2 + (malePatientsList.getRankBySubstring(END) - malePatientsList.getRankBySubstring(START) 
 					+ femalePatientsList.getRankBySubstring(START) - femalePatientsList.getRankBySubstring(END));
@@ -299,9 +299,9 @@ class Name_BST {
 		Name_BSTVertex vertex_parent = vertex.getParent();
 		//removing leaves
 		if(vertex.getLeft() == null && vertex.getRight() == null) {
-			if(vertex_parent.getLeft().equals(vertex)) {
+			if(vertex_parent.getLeft() != null && vertex_parent.getLeft().equals(vertex)) {
 				vertex_parent.setLeft(null);
-			} else if(vertex_parent.getRight().equals(vertex)) {
+			} else if(vertex_parent.getRight() != null && vertex_parent.getRight().equals(vertex)) {
 				vertex_parent.setRight(null);
 			}
 		} else if(vertex.getLeft() != null) {
