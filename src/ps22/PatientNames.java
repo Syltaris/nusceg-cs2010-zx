@@ -1,4 +1,4 @@
-package ps22;
+//package ps22;
 
 //Copy paste this Java Template and save it as "PatientNames.java"
 import java.util.*;
@@ -69,14 +69,14 @@ class PatientNames {
 		// write your answer here
 
 		// --------------------------------------------
+		System.out.println(malePatientsList.getRankBySubstring(END));
+		System.out.println(malePatientsList.getRankBySubstring(START));
+		System.out.println(femalePatientsList.getRankBySubstring(END));
+		System.out.println(femalePatientsList.getRankBySubstring(START));
+		
 		if(gender == 0) {
-//			System.out.println(malePatientsList.getRankBySubstring(END));
-//			System.out.println(malePatientsList.getRankBySubstring(START));
-//			System.out.println(femalePatientsList.getRankBySubstring(END));
-//			System.out.println(femalePatientsList.getRankBySubstring(START));
-			
 			ans = 2 + (malePatientsList.getRankBySubstring(END) - malePatientsList.getRankBySubstring(START) 
-					+ femalePatientsList.getRankBySubstring(START) - femalePatientsList.getRankBySubstring(END));
+					 + femalePatientsList.getRankBySubstring(END) - femalePatientsList.getRankBySubstring(START));
 		} else if (gender == 1) {
 			ans = 1 + malePatientsList.getRankBySubstring(END) - malePatientsList.getRankBySubstring(START);
 		} else {
@@ -325,33 +325,49 @@ class Name_BST {
 	}
 	
 	public int getRankBySubstring(String keyword) {
-		int rank = -1;
+		int rank = 1;
 		Name_BSTVertex vertex = this.root;
 		
 		//while node is still lexicographically larger than keyword
-		while(vertex.getLeft() != null && vertex.getName().compareTo(keyword) > 0) {
-			vertex = vertex.getLeft();
-		}
-		//if found lexicographically smaller word, try going right subtree first if any
-		//untill next word is now lexicographically larger again
-		while(vertex.getRight() != null && vertex.getRight().getName().compareTo(keyword) < 0 ) {
-			vertex = vertex.getRight();
-		}
-		//traverse down left again until word is reached
-		while(vertex.getLeft() != null && vertex.getName().compareTo(keyword) > 0) {
-			vertex = vertex.getLeft();
+		while(true) {
+			if(vertex.getLeft() != null && vertex.getName().compareTo(keyword) > 0) {
+				vertex = vertex.getLeft();
+			} else if(vertex.getRight() != null && vertex.getRight().getName().compareTo(keyword) < 0) {
+				rank += 1 + getSize(vertex.getLeft());
+				vertex = vertex.getRight();
+			} else {
+				return rank + getSize(vertex.getLeft());
+			}
 		}
 		
-		String patientNameToFind = vertex.getName();
-		
-		if(this.nameRankMapCache.containsKey(patientNameToFind)) {
-			rank = this.nameRankMapCache.get(patientNameToFind);
-		} else {
-			inorderTraversal(this.root, 1); //INEFFICIENT UPDATES ALL !!!!!!!!!!!!!!!!!!!!!
-			rank = this.nameRankMapCache.get(patientNameToFind);
-		}
-		
-		return rank;
+//		//while node is still lexicographically larger than keyword
+//		while(vertex.getLeft() != null && vertex.getName().compareTo(keyword) > 0) {
+//			vertex = vertex.getLeft();
+//		}
+//		//if found lexicographically smaller word, try going right subtree first if any
+//		//untill next word is now lexicographically larger again
+//		while(vertex.getRight() != null && vertex.getRight().getName().compareTo(keyword) < 0 ) {
+//			vertex = vertex.getRight();
+//		}
+//		//traverse down left again until word is reached
+//		while(vertex.getLeft() != null && vertex.getName().compareTo(keyword) > 0) {
+//			vertex = vertex.getLeft();
+//		}
+//		
+//		String patientNameToFind = vertex.getName();
+//		
+//		if(this.nameRankMapCache.containsKey(patientNameToFind)) {
+//			rank = this.nameRankMapCache.get(patientNameToFind);
+//		} else {
+////			inorderTraversal(this.root, 1); //INEFFICIENT UPDATES ALL !!!!!!!!!!!!!!!!!!!!!			
+////			rank = this.nameRankMapCache.get(patientNameToFind);
+//			
+//			rank = getSize(vertex) + 1;
+//			System.out.println("RANK:" + rank);
+//			this.nameRankMapCache.put(keyword, rank); //cache for further searches
+//		}
+//		
+//		return rank;
 	}
 	
 	@Override
@@ -440,13 +456,25 @@ class Name_BST {
 		}
 	}
 	
+	//recursively returns size of tree/sub-tree from node (as root)
+	private int getSize(Name_BSTVertex node) {
+		if(node == null) {
+			return 0;
+		}
+		return getSize(node.getLeft()) + getSize(node.getRight()) + 1;
+	}
+	
 	//update all 
 	private int inorderTraversal(Name_BSTVertex node, int currRank) {
 		if(node == null) {
 			return 0;
 		}
-		inorderTraversal(node.getLeft(), currRank); //if came out from left child
-		this.nameRankMapCache.put(node.getName(), currRank++);
+		
+		int tempRank = inorderTraversal(node.getLeft(), currRank); //if came out from left child
+		if(tempRank != 0) {
+			currRank = tempRank;
+		}
+		this.nameRankMapCache.put(node.getName(), ++currRank);
 		inorderTraversal(node.getRight(), currRank); //pass on to the successor
 		
 		return currRank;
