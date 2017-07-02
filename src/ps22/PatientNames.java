@@ -1,4 +1,4 @@
-//package ps22;
+package ps22;
 
 //Copy paste this Java Template and save it as "PatientNames.java"
 import java.util.*;
@@ -69,10 +69,10 @@ class PatientNames {
 		// write your answer here
 
 		// --------------------------------------------
-		System.out.println(malePatientsList.getRankBySubstring(END));
-		System.out.println(malePatientsList.getRankBySubstring(START));
-		System.out.println(femalePatientsList.getRankBySubstring(END));
-		System.out.println(femalePatientsList.getRankBySubstring(START));
+//		System.out.println(malePatientsList.getRankBySubstring(END));
+//		System.out.println(malePatientsList.getRankBySubstring(START));
+//		System.out.println(femalePatientsList.getRankBySubstring(END));
+//		System.out.println(femalePatientsList.getRankBySubstring(START));
 		
 		if(gender == 0) {
 			ans = 2 + (malePatientsList.getRankBySubstring(END) - malePatientsList.getRankBySubstring(START) 
@@ -132,7 +132,6 @@ class Name_BSTVertex implements Comparable<Name_BSTVertex> {
 	private String key_name;
 	private int height;
 	private int balance_factor;
-	private int size;
 
 	public Name_BSTVertex(String key_name, Name_BSTVertex parent) {
 		this.key_name = key_name;
@@ -166,9 +165,6 @@ class Name_BSTVertex implements Comparable<Name_BSTVertex> {
 	public int getBalance_factor() {
 		return balance_factor;
 	}
-	public int getSize() {
-		return this.size;
-	}
 
 	public void setParent(Name_BSTVertex parent) {
 		this.parent = parent;
@@ -189,9 +185,6 @@ class Name_BSTVertex implements Comparable<Name_BSTVertex> {
 	public void setBalance_factor(int balance_factor) {
 		this.balance_factor = balance_factor;
 	}
-	public void setSize(int size) {
-		this.size = size;
-	}
 	
 	private int calculateBalanceFactor() {
 		int bf = 0;
@@ -205,7 +198,7 @@ class Name_BSTVertex implements Comparable<Name_BSTVertex> {
 			bf = this.getLeft().getHeight() - this.getRight().getHeight();
 		}
 		
-		return Math.abs(bf);
+		return bf < 0 ? -bf : bf;
 	}
 	
 
@@ -339,35 +332,6 @@ class Name_BST {
 				return rank + getSize(vertex.getLeft());
 			}
 		}
-		
-//		//while node is still lexicographically larger than keyword
-//		while(vertex.getLeft() != null && vertex.getName().compareTo(keyword) > 0) {
-//			vertex = vertex.getLeft();
-//		}
-//		//if found lexicographically smaller word, try going right subtree first if any
-//		//untill next word is now lexicographically larger again
-//		while(vertex.getRight() != null && vertex.getRight().getName().compareTo(keyword) < 0 ) {
-//			vertex = vertex.getRight();
-//		}
-//		//traverse down left again until word is reached
-//		while(vertex.getLeft() != null && vertex.getName().compareTo(keyword) > 0) {
-//			vertex = vertex.getLeft();
-//		}
-//		
-//		String patientNameToFind = vertex.getName();
-//		
-//		if(this.nameRankMapCache.containsKey(patientNameToFind)) {
-//			rank = this.nameRankMapCache.get(patientNameToFind);
-//		} else {
-////			inorderTraversal(this.root, 1); //INEFFICIENT UPDATES ALL !!!!!!!!!!!!!!!!!!!!!			
-////			rank = this.nameRankMapCache.get(patientNameToFind);
-//			
-//			rank = getSize(vertex) + 1;
-//			System.out.println("RANK:" + rank);
-//			this.nameRankMapCache.put(keyword, rank); //cache for further searches
-//		}
-//		
-//		return rank;
 	}
 	
 	@Override
@@ -423,60 +387,11 @@ class Name_BST {
 		}
 	}
 	
-	private Name_BSTVertex findPredeccessor(Name_BSTVertex node) throws Exception {
-		Name_BSTVertex vertex = node, vertex_parent;
-		
-		//successor is in left subtree
-		if(vertex.getLeft() != null) {
-			//if right is null, return this
-			//else traverse right until vertex's right child is null, return this
-			vertex = node.getLeft();
-			
-			while(vertex.getRight() != null) {
-				vertex = vertex.getRight();
-			}
-			
-			return vertex;
-		} else { //predecccesor is parent or in parents' left subtree
-			vertex_parent = vertex.getParent();
-			
-			//traverse up and right of the tree from left (if so)
-			//until traverse up and left once
-			while(vertex_parent != null && vertex.equals(vertex_parent.getLeft())) {
-				vertex = vertex_parent;
-				vertex_parent = vertex.getParent();
-			}
-			
-			//if root, return ERR
-			if(vertex_parent == null) {
-				throw new Exception("root is reached unexpectedly");
-			} else {
-				return vertex_parent;
-			}
-		}
-	}
-	
 	//recursively returns size of tree/sub-tree from node (as root)
 	private int getSize(Name_BSTVertex node) {
 		if(node == null) {
 			return 0;
 		}
 		return getSize(node.getLeft()) + getSize(node.getRight()) + 1;
-	}
-	
-	//update all 
-	private int inorderTraversal(Name_BSTVertex node, int currRank) {
-		if(node == null) {
-			return 0;
-		}
-		
-		int tempRank = inorderTraversal(node.getLeft(), currRank); //if came out from left child
-		if(tempRank != 0) {
-			currRank = tempRank;
-		}
-		this.nameRankMapCache.put(node.getName(), ++currRank);
-		inorderTraversal(node.getRight(), currRank); //pass on to the successor
-		
-		return currRank;
 	}
 }
