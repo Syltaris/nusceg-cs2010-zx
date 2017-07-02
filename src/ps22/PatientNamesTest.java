@@ -21,12 +21,15 @@ public class PatientNamesTest {
 	File testFile = new File("D:\\Repos\\cs2010-zx\\src\\ps22\\test1.in");
 	File outputFile = new File("D:\\Repos\\cs2010-zx\\src\\ps22\\test1.out");
 
+	
 	@Test
 	public void mainFileTest() throws IOException {
 		BufferedReader br = new BufferedReader(new FileReader(testFile));
 		BufferedReader brout = new BufferedReader(new FileReader(outputFile));
 
 		PrintWriter pr = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out)));
+		
+		int counter = 0;
 		while (true) {
 			StringTokenizer st = new StringTokenizer(br.readLine());
 			int command = Integer.parseInt(st.nextToken());
@@ -41,7 +44,8 @@ public class PatientNamesTest {
 						exe.Query(st.nextToken(), // START
 						st.nextToken(), // END
 						Integer.parseInt(st.nextToken()))); // GENDER
-			
+
+			System.out.println("INSTRUCTION " + counter++);
 			System.out.println(exe.getMaleBST());
 			System.out.println(exe.getFemaleBST());
 		}
