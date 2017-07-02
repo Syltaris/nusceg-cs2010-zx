@@ -284,7 +284,17 @@ class Name_BST {
 			vertex_parent.setRight(vertex.getRight()); //inherit right children
 		} else {
 			//replace vertex with successor
-			vertex = findSuccessor(vertex);
+			Name_BSTVertex vertex_successor = null;
+			try {
+				vertex_successor = findSuccessor(vertex);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			vertex_successor.setParent(vertex.getParent());
+			vertex_successor.setLeft(vertex.getLeft());
+			vertex_successor.setRight(vertex.getRight());
+			vertex_successor.setHeight(vertex.getHeight());
 		}
 	}
 	
