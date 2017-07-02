@@ -29,7 +29,7 @@ public class PatientNamesTest {
 
 		PrintWriter pr = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out)));
 		
-		int counter = 0;
+		int counter = 1;
 		while (true) {
 			StringTokenizer st = new StringTokenizer(br.readLine());
 			int command = Integer.parseInt(st.nextToken());
@@ -40,7 +40,7 @@ public class PatientNamesTest {
 			else if (command == 2) // RemovePatient
 				exe.RemovePatient(st.nextToken());
 			else // if (command == 3) // Query
-				assertEquals(brout.readLine(),
+				assertEquals(Integer.parseInt(brout.readLine()),
 						exe.Query(st.nextToken(), // START
 						st.nextToken(), // END
 						Integer.parseInt(st.nextToken()))); // GENDER
