@@ -64,7 +64,7 @@ class PatientNames {
 		// write your answer here
 
 		// --------------------------------------------
-
+		
 		// --------------------------------------------
 
 		return ans;
@@ -163,6 +163,7 @@ class Name_BSTVertex implements Comparable<Name_BSTVertex> {
 
 	public void setHeight(int height) {
 		this.height = height;
+		this.balance_factor = calculateBalanceFactor();
 	}
 	public void setBalance_factor(int balance_factor) {
 		this.balance_factor = balance_factor;
@@ -199,8 +200,6 @@ class Name_BSTVertex implements Comparable<Name_BSTVertex> {
 		output = output.concat("NAME: " + key_name).concat(",HEIGHT: " + height).concat(",BF: " + balance_factor);
 		return output;
 	}
-
-
 }
 
 class Name_BST {
@@ -247,7 +246,7 @@ class Name_BST {
 			}
 			nodeToInsert.setParent(vertex_parent);
 			
-			//update balance factor and height
+			//update balance factor and height going up the path from leaf to root
 			while(vertex_parent != null) {
 				int currHeight = 1; //assume starting from leaf
 				
@@ -255,6 +254,36 @@ class Name_BST {
 				vertex_parent = vertex_parent.getParent();
 			}
 			//check and rotate
+		}
+		
+	}
+		
+	public void delete(String name) {
+		Name_BSTVertex nodeToDelete = new Name_BSTVertex(name, null), vertex = this.root;
+		
+		//navigate to the node to be deleted
+		while(vertex != null && vertex.compareTo(nodeToDelete) != 0) {
+			if(vertex.compareTo(nodeToDelete) < 0) {
+				vertex = vertex.getRight();
+			} else if (vertex.compareTo(nodeToDelete) > 0) {
+				vertex = vertex.getLeft();
+			}
+		}
+		
+		Name_BSTVertex vertex_parent = vertex.getParent();
+		//removing leaves
+		if(vertex.getLeft() == null && vertex.getRight() == null) {
+			if(vertex_parent.getLeft().equals(vertex)) {
+				vertex_parent.setLeft(null);
+			} else if(vertex_parent.getRight().equals(vertex)) {
+				vertex_parent.setRight(null);
+			}
+		} else if(vertex.getLeft() != null) {
+			vertex_parent.setLeft(vertex.getLeft()); //inherit left children
+		} else if(vertex.getRight() != null) {
+			vertex_parent.setRight(vertex.getRight()); //inherit right children
+		} else {
+			//replace vertex with successor
 		}
 	}
 	
