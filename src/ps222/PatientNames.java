@@ -1,4 +1,4 @@
-package ps22;
+package ps222;
 
 import java.util.*;
 import java.io.*;
@@ -124,7 +124,6 @@ class Name_BSTVertex {
 		this.key_name = key_name;
 		this.left = null;
 		this.right = null;
-		
 		this.height = 0; //assumption that vertex will always be leaf?
 	}
 
@@ -151,14 +150,14 @@ class Name_BSTVertex {
 		if(this.getLeft() == null && this.getRight() == null) {
 			bf = 0; // -1 + (-1)
 		} else if(this.getLeft() == null) {
-			bf = this.getRight().getHeight() + 1; // right - (-1)
+			bf = -1 - this.getRight().getHeight(); // right - (-1)
 		} else if(this.getRight() == null) {
 			bf = this.getLeft().getHeight() + 1; //left - (-1)
 		} else {
 			bf = this.getLeft().getHeight() - this.getRight().getHeight();
 		}
 		
-		return bf < 0 ? -bf : bf;
+		return bf;
 	}
 	public int compareTo(Name_BSTVertex o) {return this.key_name.compareTo(o.key_name);}
 
@@ -177,8 +176,8 @@ class Name_BST {
 
 	public Name_BST() {
 		this.root = null;
-		this.startQueryRankCache = new HashMap<String, Integer>();
-		this.endQueryRankCache = new HashMap<String, Integer>();
+		this.startQueryRankCache = new HashMap<String, Integer>(20000);
+		this.endQueryRankCache = new HashMap<String, Integer>(20000);
 	}
 
 	public void insert(String name) {
@@ -217,7 +216,7 @@ class Name_BST {
 			updateHeightFromLeaf(nodeToInsert);
 			
 			// check and rotate
-			
+			rebalance(nodeToInsert);
 		}
 
 	} 
@@ -261,7 +260,6 @@ class Name_BST {
 	        T.setRight(delete(T.getRight(), successorV));      // delete the old successorV
 	      }
 	    }
-	    
 	    return T;                                          // return the updated BST
 	  }
 	  
@@ -283,8 +281,7 @@ class Name_BST {
 		  
 		  while(node != null) {
 			  if(node.getLeft() != null && node.getRight() != null) {
-				  node.setHeight(1 + (node.getLeft().getHeight() > node.getRight().getHeight() ? 
-						  node.getLeft().getHeight() : node.getLeft().getHeight()));
+				  node.setHeight(1 + (max(node.getLeft().getHeight(),  node.getRight().getHeight())));
 			  }else {
 				  node.setHeight(height);
 			  }
@@ -293,17 +290,93 @@ class Name_BST {
 		  }
 	  }
 	  
-	  private void rebalance() {
-		  
+	  private void rebalance(Name_BSTVertex node) {
+		  while(node != null) {
+			  if(node.getBalance_factor() == 2 && node.getLeft() != null && node.getLeft().getBalance_factor() == 1) {
+				  rotateRight(node);
+				  updateHeight(node);
+
+			  } else if(node.getBalance_factor() == 2 && node.getLeft() != null && node.getLeft().getBalance_factor() == -1) {
+				  rotateLeft(node.getLeft());
+				  rotateRight(node);
+				  updateHeight(node);
+
+			  } else if(node.getBalance_factor() == -2 && node.getRight() != null && node.getRight().getBalance_factor() == -1) {
+				  rotateLeft(node);
+				  updateHeight(node);
+
+			  } else if(node.getBalance_factor() == -2 && node.getRight() != null && node.getRight().getBalance_factor() == 1) {
+				  rotateRight(node.getRight());
+				  rotateLeft(node);
+				  updateHeight(node);
+
+			  }
+			  
+			  node = node.getParent();
+		  }
 	  }
 	  
-	  private void rotateRight(Name_BSTVertex leftNode, Name_BSTVertex rightNode) {
-		 
+	  private Name_BSTVertex rotateLeft(Name_BSTVertex node) {
+		  Name_BSTVertex right = node.getRight();
+		  
+		  node.setRight(right.getLeft());
+		  if(right.getLeft() != null) {
+			  right.getLeft().setParent(node);
+		  }
+		  
+		  right.setParent(node.getParent());
+		  if(node.getParent() != null && node.getParent().getLeft() == node) {
+			  node.getParent().setLeft(right);
+		  } else if(node.getParent() != null) {
+			  node.getParent().setRight(right);
+		  }
+		  
+		  right.setLeft(node);
+		  node.setParent(right);
+		  
+		  node.setHeight(1 + max(node.getLeft() == null ? 0 : node.getLeft().getHeight(),
+				  node.getRight() == null ? 0 : node.getRight().getHeight()));
+		  right.setHeight(1 + max(right.getLeft() == null ? 0 : right.getLeft().getHeight(),
+				  right.getRight() == null ? 0 : right.getRight().getHeight()));
+		  
+		  if(right.getParent() == null) {
+			  this.root = right;
+		  }
+		  
+		  return right;
 	  }
 	  
-	  private void rotateLeft(Name_BSTVertex leftNode, Name_BSTVertex rightNode) {
+	  private Name_BSTVertex rotateRight(Name_BSTVertex node) {
+		  Name_BSTVertex left = node.getLeft();
 		  
+		  node.setLeft(left.getRight());
+		  if(left.getRight() != null) {
+			  left.getRight().setParent(node);
+		  }
+		  
+		  left.setParent(node.getParent());
+		  if(node.getParent() != null && node.getParent().getLeft() == node) {
+			  node.getParent().setLeft(left);
+		  } else if(node.getParent() != null) {
+			  node.getParent().setRight(left);
+		  }
+		  
+		  left.setRight(node);
+		  node.setParent(left);
+		  
+		  node.setHeight(1 + max(node.getLeft() == null ? 0 : node.getLeft().getHeight(),
+				  node.getRight() == null ? 0 : node.getRight().getHeight()));
+		  left.setHeight(1 + max(left.getLeft() == null ? 0 : left.getLeft().getHeight(),
+				  left.getRight() == null ? 0 : left.getRight().getHeight()));
+		  
+		  if(left.getParent() == null) {
+			  this.root = left;
+		  }
+		  
+		  return left;
 	  }
+
+	  private int max(int a, int b) {return a > b ? a : b;}
 	  
 	public int getRankBySubstring(String keyword, boolean inclusive) {
 		int rank = 1;
@@ -338,26 +411,20 @@ class Name_BST {
 			this.startQueryRankCache.put(keyword, rank);
 		else 
 			this.endQueryRankCache.put(keyword, rank);
-		
-		
+
 		return rank;
 	}
 	
 	//recursively returns size of tree/sub-tree from node (as root)
 	private int getSize(Name_BSTVertex node) {
-		if(node == null) {
-			return 0;
-		}
+		if(node == null) {return 0;}
 		return getSize(node.getLeft()) + getSize(node.getRight()) + 1;
 	}
 	
 	@Override
 	public String toString() {
 		String output = new String();
-		
-		//do inorder traversal
 		inorderTraversalPrint(this.root);
-		
 		return output;
 	}
 	

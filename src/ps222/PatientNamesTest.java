@@ -1,4 +1,4 @@
-package ps22;
+package ps222;
 
 import static org.junit.Assert.*;
 
@@ -22,8 +22,8 @@ public class PatientNamesTest {
 	
 	@Test
 	public void mainFile1Test() throws IOException {
-		File testFile = new File("D:\\Repos\\cs2010-zx\\src\\ps22\\test1.in");
-		File outputFile = new File("D:\\Repos\\cs2010-zx\\src\\ps22\\test1.out");
+		File testFile = new File("D:\\Repos\\cs2010-zx\\src\\ps222\\test1.in");
+		File outputFile = new File("D:\\Repos\\cs2010-zx\\src\\ps222\\test1.out");
 		
 		BufferedReader br = new BufferedReader(new FileReader(testFile));
 		BufferedReader brout = new BufferedReader(new FileReader(outputFile));
@@ -58,8 +58,8 @@ public class PatientNamesTest {
 	
 	@Test
 	public void mainFile2Test() throws IOException {
-		File testFile = new File("D:\\Repos\\cs2010-zx\\src\\ps22\\test2.in");
-		File outputFile = new File("D:\\Repos\\cs2010-zx\\src\\ps22\\test2.out");
+		File testFile = new File("D:\\Repos\\cs2010-zx\\src\\ps222\\test2.in");
+		File outputFile = new File("D:\\Repos\\cs2010-zx\\src\\ps222\\test2.out");
 		
 		BufferedReader br = new BufferedReader(new FileReader(testFile));
 		BufferedReader brout = new BufferedReader(new FileReader(outputFile));
@@ -94,8 +94,8 @@ public class PatientNamesTest {
 	
 	@Test
 	public void mainFile3Test() throws IOException {
-		File testFile = new File("D:\\Repos\\cs2010-zx\\src\\ps22\\test3.in");
-		File outputFile = new File("D:\\Repos\\cs2010-zx\\src\\ps22\\test3.out");
+		File testFile = new File("D:\\Repos\\cs2010-zx\\src\\ps222\\test3.in");
+		File outputFile = new File("D:\\Repos\\cs2010-zx\\src\\ps222\\test3.out");
 		
 		BufferedReader br = new BufferedReader(new FileReader(testFile));
 		BufferedReader brout = new BufferedReader(new FileReader(outputFile));
@@ -203,8 +203,8 @@ public class PatientNamesTest {
 	
 	@Test
 	public void fileInputValidTest() throws IOException {
-		File testFile = new File("D:\\Repos\\cs2010-zx\\src\\ps22\\test1.in");
-		File outputFile = new File("D:\\Repos\\cs2010-zx\\src\\ps22\\test1.out");
+		File testFile = new File("D:\\Repos\\cs2010-zx\\src\\ps222\\test1.in");
+		File outputFile = new File("D:\\Repos\\cs2010-zx\\src\\ps222\\test1.out");
 		
 		BufferedReader br = new BufferedReader(new FileReader(testFile));
 		int maxL = 0;
