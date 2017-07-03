@@ -20,8 +20,8 @@ public class PatientNamesTest {
 
 	PatientNames exe = new PatientNames();
 	
-	File testFile = new File("D:\\Repos\\cs2010-zx\\src\\ps22\\test1.in");
-	File outputFile = new File("D:\\Repos\\cs2010-zx\\src\\ps22\\test1.out");
+	File testFile = new File("D:\\Repos\\cs2010-zx\\src\\ps22\\test2.in");
+	File outputFile = new File("D:\\Repos\\cs2010-zx\\src\\ps22\\test2.out");
 	
 	@Test
 	public void mainFileTest() throws IOException {
