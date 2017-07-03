@@ -9,19 +9,12 @@ import java.io.*;
 //year 2017 hash code: DZAjKugdE9QiOQKGFbut (do NOT delete this line)
 
 class PatientNames {
-	// if needed, declare a private data structure here that
-	// is accessible to all methods in this class
-
 	// --------------------------------------------
 	Name_BST malePatientsList, femalePatientsList;
 	HashMap<String, Integer> patientsGenderMap;
 	// --------------------------------------------
 
 	public PatientNames() {
-		// Write necessary code during construction;
-		//
-		// write your answer here
-
 		// --------------------------------------------
 		this.malePatientsList = new Name_BST();
 		this.femalePatientsList = new Name_BST();
@@ -30,11 +23,6 @@ class PatientNames {
 	}
 
 	void AddPatient(String patientName, int gender) {
-		// You have to insert the information (patientName, gender)
-		// into your chosen data structure
-		//
-		// write your answer here
-
 		// --------------------------------------------
 		if(gender == 1) {
 			malePatientsList.insert(patientName);
@@ -46,10 +34,6 @@ class PatientNames {
 	}
 
 	void RemovePatient(String patientName) {
-		// You have to remove the patientName from your chosen data structure
-		//
-		// write your answer here
-
 		// --------------------------------------------
 		if(patientsGenderMap.get(patientName) == 1) {
 			malePatientsList.delete(patientName);
@@ -60,19 +44,8 @@ class PatientNames {
 	}
 
 	int Query(String START, String END, int gender) {
-		int ans = 0;
-
-		// You have to answer how many patient name starts
-		// with prefix that is inside query interval [START..END)
-		//
-		// write your answer here
-
 		// --------------------------------------------
-//		System.out.println(malePatientsList.getRankBySubstring(END));
-//		System.out.println(malePatientsList.getRankBySubstring(START));
-//		System.out.println(femalePatientsList.getRankBySubstring(END));
-//		System.out.println(femalePatientsList.getRankBySubstring(START));
-		
+		int ans = 0;
 		if(gender == 0) {
 			ans = 2 + (malePatientsList.getRankBySubstring(END) - malePatientsList.getRankBySubstring(START) 
 					 + femalePatientsList.getRankBySubstring(END) - femalePatientsList.getRankBySubstring(START));
@@ -81,15 +54,12 @@ class PatientNames {
 		} else {
 			ans = 1 + femalePatientsList.getRankBySubstring(END) - femalePatientsList.getRankBySubstring(START);
 		}
-		// --------------------------------------------
-
 		return ans;
+		// --------------------------------------------
 	}
 
 	void run() throws Exception {
-		// do not alter this method to avoid unnecessary errors with the
-		// automated
-		// judging
+		// do not alter this method to avoid unnecessary errors with the automated judging
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		PrintWriter pr = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out)));
 		while (true) {
@@ -110,9 +80,7 @@ class PatientNames {
 	}
 
 	public static void main(String[] args) throws Exception {
-		// do not alter this method to avoid unnecessary errors with the
-		// automated
-		// judging
+		// do not alter this method to avoid unnecessary errors with the automated judging
 		PatientNames ps2 = new PatientNames();
 		ps2.run();
 	}
@@ -175,6 +143,10 @@ class Name_BSTVertex implements Comparable<Name_BSTVertex> {
 
 	public void setRight(Name_BSTVertex right) {
 		this.right = right;
+	}
+	
+	public void setName(String key_name) {
+		this.key_name = key_name;
 	}
 
 	public void setHeight(int height) {
@@ -240,8 +212,6 @@ class Name_BST {
 				vertex = this.root.getRight();
 			} else if(this.root.compareTo(nodeToInsert) > 0) {
 				vertex = this.root.getLeft();
-			} else {
-				System.out.println("EQUALS?"); //ERR
 			}
 			
 			//find insertion point
@@ -289,32 +259,48 @@ class Name_BST {
 		}
 		
 		Name_BSTVertex vertex_parent = vertex.getParent();
-		
-		//removing root
-		if(vertex_parent == null) {
-			replaceVertexWithSuccessor(vertex);
-			return;
-		}
-		
-		//removing leaves
-		if(vertex.getLeft() == null && vertex.getRight() == null) {
-			if(vertex_parent.getLeft() != null && vertex_parent.getLeft().equals(vertex)) {
+				
+		if(vertex.getLeft() == null && vertex.getRight() == null) { //removing leaves
+			if(vertex_parent != null && vertex_parent.getLeft() != null && vertex_parent.getLeft().equals(vertex)) {
 				vertex_parent.setLeft(null);
-			} else if(vertex_parent.getRight() != null && vertex_parent.getRight().equals(vertex)) {
+				vertex.setParent(null);
+			} else if(vertex_parent != null && vertex_parent.getRight() != null && vertex_parent.getRight().equals(vertex)) {
 				vertex_parent.setRight(null);
+				vertex.setParent(null);
 			}
-		} else if(vertex.getLeft() != null) {
-			vertex_parent.setLeft(vertex.getLeft()); //inherit left children
-			vertex.getLeft().setParent(vertex_parent);
-		} else if(vertex.getRight() != null) {
-			vertex_parent.setRight(vertex.getRight()); //inherit right children
+			
+			if(vertex == this.root) {
+				this.root = null;
+			}
+		} else if (vertex.getLeft() == null && vertex.getRight() != null) { //node to be deleted has 1 child
+			if(vertex_parent != null && vertex_parent.getLeft() != null && vertex_parent.getLeft().equals(vertex)) { //possible?
+				vertex_parent.setLeft(vertex.getRight());
+			} else if (vertex_parent != null) {
+				vertex_parent.setRight(vertex.getRight());
+			}
 			vertex.getRight().setParent(vertex_parent);
-		} else {
+			
+			if(vertex == this.root) {
+				this.root = vertex.getRight();
+			}
+		} else if (vertex.getLeft() != null && vertex.getRight() == null) { 
+			if(vertex_parent != null && vertex_parent.getLeft() != null && vertex_parent.getLeft().equals(vertex)) { //possible?
+				vertex_parent.setLeft(vertex.getLeft());
+			} else if (vertex_parent != null) {
+				vertex_parent.setRight(vertex.getLeft());
+			}
+			vertex.getLeft().setParent(vertex_parent);
+			
+			if(vertex == this.root) {
+				this.root = vertex.getLeft();
+			}
+		} else { //node to be deleted has 2 children
 			//replace vertex with successor
 			replaceVertexWithSuccessor(vertex);
 		}
 	}
 	
+	//assumes vertex has 2 children
 	private void replaceVertexWithSuccessor(Name_BSTVertex vertex) {
 		Name_BSTVertex vertex_successor = null;
 		try {
@@ -323,43 +309,28 @@ class Name_BST {
 			e.printStackTrace();
 		}
 		
-		if(vertex.getParent() == null) {
-			this.root = vertex_successor;
-		}
-		
-		if((vertex_successor.getParent().getRight() != null && vertex_successor.getParent().getRight().equals(vertex_successor))) {
-			vertex_successor.setLeft(vertex_successor.getParent().getLeft());
-			
-			if(vertex_successor.getParent().getParent() != null) {
-				vertex_successor.getParent().getParent().setRight(vertex_successor);
-			}
-			vertex_successor.setParent(vertex_successor.getParent().getParent());
-
-		} else if(vertex_successor.getParent().getLeft() != null && vertex_successor.getParent().getLeft().equals(vertex_successor)){
-			vertex_successor.getParent().setLeft(vertex_successor.getRight());
-			if(vertex_successor.getRight() != null) {	
-				vertex_successor.getRight().setParent(vertex_successor.getParent());
-			}
-			
+		if(vertex_successor.getParent().equals(vertex)) { //if successor is next element w/o left subtree
 			vertex_successor.setParent(vertex.getParent());
 			vertex_successor.setLeft(vertex.getLeft());
-			vertex_successor.setRight(vertex.getRight());
-			vertex_successor.setHeight(vertex.getHeight());
 			if(vertex.getLeft() != null) {
 				vertex.getLeft().setParent(vertex_successor);
-			}
-			if(vertex.getRight() != null) {
-				vertex.getRight().setParent(vertex_successor);
+				vertex.setLeft(null);
 			}
 			if(vertex.getParent() != null) {
-				if(vertex.getParent().getLeft().equals(vertex)) {
-					vertex.getParent().setLeft(vertex_successor);
-				} else {
-					vertex.getParent().setRight(vertex_successor);
-				}
-			}	
+				vertex.getParent().setRight(vertex_successor);
+				vertex.setParent(null);
+			}
+			vertex.setRight(null);
+			
+			//if root
+			if(vertex == this.root) {
+				this.root = vertex_successor;
+			}  
+		} else { //successor is element in left subtree
+			vertex.setName(vertex_successor.getName());
+			vertex_successor.getParent().setLeft(null);
+			vertex_successor.setParent(null);
 		}
-
 	}
 
 	public int getRankBySubstring(String keyword) {
