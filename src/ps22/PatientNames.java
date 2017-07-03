@@ -1,4 +1,3 @@
-package ps22;
 
 import java.util.*;
 import java.io.*;
@@ -56,24 +55,24 @@ class PatientNames {
 		String femaleLargestName = femalePatientsList.findMax();
 		
 		if(gender == 0) {
-			if(START.compareTo(maleLargestName) > 0) {
+			if(maleLargestName == null || START.compareTo(maleLargestName) > 0) {
 				ans = 0;
 			} else {
 				ans = 1 + malePatientsList.getRankBySubstring(END, false) - malePatientsList.getRankBySubstring(START, true);
 			}
-			if(START.compareTo(femaleLargestName) > 0) {
+			if(femaleLargestName == null || START.compareTo(femaleLargestName) > 0) {
 				ans += 0;
 			} else {
 				ans += 1 + femalePatientsList.getRankBySubstring(END, false) - femalePatientsList.getRankBySubstring(START, true);
 			}
 		} else if (gender == 1) {
-			if(START.compareTo(maleLargestName) > 0) {
+			if(maleLargestName == null || START.compareTo(maleLargestName) > 0) {
 				ans = 0;
 			} else {
 				ans = 1 + malePatientsList.getRankBySubstring(END, false) - malePatientsList.getRankBySubstring(START, true);
 			}
 		} else {
-			if(START.compareTo(femaleLargestName) > 0) {
+			if(femaleLargestName == null || START.compareTo(femaleLargestName) > 0) {
 				ans = 0;
 			} else {
 				ans = 1 + femalePatientsList.getRankBySubstring(END, false) - femalePatientsList.getRankBySubstring(START, true);
@@ -282,9 +281,9 @@ class Name_BST {
 				rank += 1 + getSize(vertex.getLeft());
 				vertex = vertex.getRight();
 			} else {
-				if(!inclusive && vertex.getName().compareTo(keyword) > 0) {
+				if(!inclusive && vertex.getName().compareTo(keyword) >= 0) {
 					rank--;
-				} else if (inclusive && vertex.getName().compareTo(keyword) <= 0) {
+				} else if (inclusive && vertex.getName().compareTo(keyword) < 0) {
 					rank++;
 				}
 				rank += getSize(vertex.getLeft());
@@ -328,7 +327,7 @@ class Name_BST {
 
 	  // overloadded recursive method to perform findMin
 	  protected String findMin(Name_BSTVertex T) {
-	         if (T == null)      throw new NoSuchElementException("BST is empty, no minimum");
+	         if (T == null)      return null;
 	    else if (T.getLeft() == null) return T.getName();                    // this is the min
 	    else                     return findMin(T.getLeft());           // go to the left
 	  }
@@ -338,7 +337,7 @@ class Name_BST {
 
 	  // overloadded recursive method to perform findMax
 	  protected String findMax(Name_BSTVertex T) {
-	         if (T == null)       throw new NoSuchElementException("BST is empty, no maximum");
+	         if (T == null)       return null;
 	    else if (T.getRight() == null) return T.getName();                   // this is the max
 	    else                      return findMax(T.getRight());        // go to the right
 	  }
