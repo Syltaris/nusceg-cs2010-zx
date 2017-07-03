@@ -46,14 +46,42 @@ class PatientNames {
 	int Query(String START, String END, int gender) {
 		// --------------------------------------------
 		int ans = 0;
+		
+		System.out.println(malePatientsList.getRankBySubstring(START, true));
+		System.out.println(malePatientsList.getRankBySubstring(END, false));
+		System.out.println(femalePatientsList.getRankBySubstring(START, true));
+		System.out.println(femalePatientsList.getRankBySubstring(END, false));
+
+		String maleLargestName = malePatientsList.findMax();
+		String femaleLargestName = femalePatientsList.findMax();
+		
 		if(gender == 0) {
-			ans = 2 + (malePatientsList.getRankBySubstring(END) - malePatientsList.getRankBySubstring(START) 
-					 + femalePatientsList.getRankBySubstring(END) - femalePatientsList.getRankBySubstring(START));
+			if(START.compareTo(maleLargestName) > 0) {
+				ans = 0;
+			} else {
+				ans = 1 + malePatientsList.getRankBySubstring(END, false) - malePatientsList.getRankBySubstring(START, true);
+			}
+			if(START.compareTo(femaleLargestName) > 0) {
+				ans += 0;
+			} else {
+				ans += 1 + femalePatientsList.getRankBySubstring(END, false) - femalePatientsList.getRankBySubstring(START, true);
+			}
 		} else if (gender == 1) {
-			ans = 1 + malePatientsList.getRankBySubstring(END) - malePatientsList.getRankBySubstring(START);
+			if(START.compareTo(maleLargestName) > 0) {
+				ans = 0;
+			} else {
+				ans = 1 + malePatientsList.getRankBySubstring(END, false) - malePatientsList.getRankBySubstring(START, true);
+			}
 		} else {
-			ans = 1 + femalePatientsList.getRankBySubstring(END) - femalePatientsList.getRankBySubstring(START);
+			if(START.compareTo(femaleLargestName) > 0) {
+				ans = 0;
+			} else {
+				ans = 1 + femalePatientsList.getRankBySubstring(END, false) - femalePatientsList.getRankBySubstring(START, true);
+			}
 		}
+		
+
+		
 		return ans;
 		// --------------------------------------------
 	}
@@ -100,9 +128,8 @@ class Name_BSTVertex implements Comparable<Name_BSTVertex> {
 	private int height;
 	private int balance_factor;
 
-	public Name_BSTVertex(String key_name, Name_BSTVertex parent) {
+	public Name_BSTVertex(String key_name) {
 		this.key_name = key_name;
-		this.parent = parent;
 		this.left = null;
 		this.right = null;
 		
@@ -197,151 +224,91 @@ class Name_BST {
 		this.nameRankMapCache = new HashMap<String, Integer>();
 	}
 
-	public void insert(String name) {
-		this.nameRankMapCache.clear(); //invalidate cache
-		
-		Name_BSTVertex nodeToInsert = new Name_BSTVertex(name, null);
-		
-		if(this.root == null) {
-			root = nodeToInsert;
-		} else {
-			//traverse left, else right
-			Name_BSTVertex vertex = root, vertex_parent = null;
-			
-			//find insertion point
-			while(vertex != null) {
-				vertex_parent = vertex;
-				//if node value is larger than curr vertex, continue going right, else go left
-				if(vertex.compareTo(nodeToInsert) < 0) {
-					vertex = vertex.getRight();
-				} else if(vertex.compareTo(nodeToInsert) > 0) {
-					vertex = vertex.getLeft();
-				}
-			}
+	  // method called to insert a new key with value v into BST
+	  public void insert(String v) { root = insert(root, v); }
 
-			//insert node
-			if(vertex_parent.compareTo(nodeToInsert) < 0) {
-				vertex_parent.setRight(nodeToInsert);
-			} else {
-				vertex_parent.setLeft(nodeToInsert);
-			}
-			nodeToInsert.setParent(vertex_parent);
-			
-			//update balance factor and height going up the path from leaf to root
-			int currHeight = 1; //assume starting from leaf
-			while(vertex_parent != null) {
-				vertex_parent.setHeight(currHeight++);
-				vertex_parent = vertex_parent.getParent();
-			}
-			//check and rotate
-		}
-		
-	}
-		
-	public void delete(String name) {
-		this.nameRankMapCache.clear(); //invalidate cache
-		
-		Name_BSTVertex nodeToDelete = new Name_BSTVertex(name, null), vertex = this.root;
-		
-		//navigate to the node to be deleted
-		while(vertex != null && vertex.compareTo(nodeToDelete) != 0) {
-			if(vertex.compareTo(nodeToDelete) < 0) {
-				vertex = vertex.getRight();
-			} else if (vertex.compareTo(nodeToDelete) > 0) {
-				vertex = vertex.getLeft();
-			}
-		}
-		
-		Name_BSTVertex vertex_parent = vertex.getParent();
-				
-		if(vertex.getLeft() == null && vertex.getRight() == null) { //removing leaves
-			if(vertex_parent != null && vertex_parent.getLeft() != null && vertex_parent.getLeft().equals(vertex)) {
-				vertex_parent.setLeft(null);
-				vertex.setParent(null);
-			} else if(vertex_parent != null && vertex_parent.getRight() != null && vertex_parent.getRight().equals(vertex)) {
-				vertex_parent.setRight(null);
-				vertex.setParent(null);
-			}
-			
-			if(vertex == this.root) {
-				this.root = null;
-			}
-		} else if (vertex.getLeft() == null && vertex.getRight() != null) { //node to be deleted has 1 child
-			if(vertex_parent != null && vertex_parent.getLeft() != null && vertex_parent.getLeft().equals(vertex)) { //possible?
-				vertex_parent.setLeft(vertex.getRight());
-			} else if (vertex_parent != null) {
-				vertex_parent.setRight(vertex.getRight());
-			}
-			vertex.getRight().setParent(vertex_parent);
-			
-			if(vertex == this.root) {
-				this.root = vertex.getRight();
-			}
-		} else if (vertex.getLeft() != null && vertex.getRight() == null) { 
-			if(vertex_parent != null && vertex_parent.getLeft() != null && vertex_parent.getLeft().equals(vertex)) { //possible?
-				vertex_parent.setLeft(vertex.getLeft());
-			} else if (vertex_parent != null) {
-				vertex_parent.setRight(vertex.getLeft());
-			}
-			vertex.getLeft().setParent(vertex_parent);
-			
-			if(vertex == this.root) {
-				this.root = vertex.getLeft();
-			}
-		} else { //node to be deleted has 2 children
-			//replace vertex with successor
-			replaceVertexWithSuccessor(vertex);
-		}
-	}
-	
-	//assumes vertex has 2 children
-	private void replaceVertexWithSuccessor(Name_BSTVertex vertex) {
-		Name_BSTVertex vertex_successor = null;
-		try {
-			vertex_successor = findSuccessor(vertex);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		if(vertex_successor.getParent().equals(vertex)) { //if successor is next element w/o left subtree
-			vertex_successor.setParent(vertex.getParent());
-			vertex_successor.setLeft(vertex.getLeft());
-			if(vertex.getLeft() != null) {
-				vertex.getLeft().setParent(vertex_successor);
-				vertex.setLeft(null);
-			}
-			if(vertex.getParent() != null) {
-				vertex.getParent().setRight(vertex_successor);
-				vertex.setParent(null);
-			}
-			vertex.setRight(null);
-			
-			//if root
-			if(vertex == this.root) {
-				this.root = vertex_successor;
-			}  
-		} else { //successor is element in left subtree
-			vertex.setName(vertex_successor.getName());
-			vertex_successor.getParent().setLeft(null);
-			vertex_successor.setParent(null);
-		}
-	}
+	  // overloaded recursive method to perform insertion of new vertex into BST
+	  protected Name_BSTVertex insert(Name_BSTVertex T, String v) {
+	    if (T == null) return new Name_BSTVertex(v);          // insertion point is found
 
-	public int getRankBySubstring(String keyword) {
+	    if (T.getName().compareTo(v) < 0) {                                      // search to the right
+	      T.setRight(insert(T.getRight(), v));
+	      T.getRight().setParent(T);
+	    }
+	    else {                                                 // search to the left
+	      T.setLeft(insert(T.getLeft(), v));
+	      T.getLeft().setParent(T);
+	    }
+
+	    return T;                                          // return the updated BST
+	  }  
+
+	  // public method to delete a vertex containing key with value v from BST
+	  public void delete(String v) { root = delete(root, v); }
+
+	  // overloaded recursive method to perform deletion 
+	  protected Name_BSTVertex delete(Name_BSTVertex T, String v) {
+	    if (T == null)  return T;              // cannot find the item to be deleted
+
+	    if (T.getName().compareTo(v) < 0)                // search to the right
+	      T.setRight(delete(T.getRight(), v));
+	    else if (T.getName().compareTo(v) > 0)           // search to the left
+	      T.setLeft(delete(T.getLeft(), v));
+	    else {                                            // this is the node to be deleted
+	      if (T.getLeft() == null && T.getRight() == null)                   // this is a leaf
+	        T = null;                                      // simply erase this node
+	      else if (T.getLeft() == null && T.getRight() != null) {   // only one child at right        
+	        T.getRight().setParent(T.getParent());
+	        T = T.getRight();                                                 // bypass T        
+	      }
+	      else if (T.getLeft() != null && T.getRight() == null) {    // only one child at left        
+	        T.getLeft().setParent(T.getParent());
+	        T = T.getLeft();                                                  // bypass T        
+	      }
+	      else {                                 // has two children, find successor
+	        String successorV = successor(v);
+	        T.setName(successorV);         // replace this key with the successor's key
+	        T.setRight(delete(T.getRight(), successorV));      // delete the old successorV
+	      }
+	    }
+	    
+	    return T;                                          // return the updated BST
+	  }
+
+	public int getRankBySubstring(String keyword, boolean inclusive) {
 		int rank = 1;
 		Name_BSTVertex vertex = this.root;
 		
 		//while node is still lexicographically larger than keyword
-		while(true) {
+		while(vertex != null) {
 			if(vertex.getLeft() != null && vertex.getName().compareTo(keyword) > 0) {
 				vertex = vertex.getLeft();
-			} else if(vertex.getRight() != null && vertex.getRight().getName().compareTo(keyword) < 0) {
+			} else if(vertex.getRight() != null && (vertex.getName().compareTo(keyword) < 0)) {
 				rank += 1 + getSize(vertex.getLeft());
 				vertex = vertex.getRight();
 			} else {
-				return rank + getSize(vertex.getLeft());
+				if(!inclusive && vertex.getName().compareTo(keyword) > 0) {
+					rank--;
+				} 
+//				else if (inclusive && !vertex.getName().startsWith(keyword)){
+//					rank++;
+//				} else if (inclusive && !vertex.getName().startsWith(keyword)){
+//					rank++;
+//				} )
+				rank += getSize(vertex.getLeft());
+				break;
 			}
 		}
+		
+		return rank;
+	}
+	
+	//recursively returns size of tree/sub-tree from node (as root)
+	private int getSize(Name_BSTVertex node) {
+		if(node == null) {
+			return 0;
+		}
+		return getSize(node.getLeft()) + getSize(node.getRight()) + 1;
 	}
 	
 	@Override
@@ -364,44 +331,59 @@ class Name_BST {
 		return inorderTraversalPrint(node.getRight()); //pass on to the successor
 	}
 	
-	private Name_BSTVertex findSuccessor(Name_BSTVertex node) throws Exception {
-		Name_BSTVertex vertex = node, vertex_parent;
-		
-		//successor is in right subtree
-		if(vertex.getRight() != null) {
-			//if left is null, return this
-			//else traverse left until vertex's left child is null, return this
-			vertex = node.getRight();
-			
-			while(vertex.getLeft() != null) {
-				vertex = vertex.getLeft();
-			}
-			
-			return vertex;
-		} else { //succesor is parent or in parents' right subtree
-			vertex_parent = vertex.getParent();
-			
-			//traverse up and left of the tree from right(if so)
-			//until traverse up and right once
-			while(vertex_parent != null && vertex.equals(vertex_parent.getRight())) {
-				vertex = vertex_parent;
-				vertex_parent = vertex.getParent();
-			}
-			
-			//if root, return ERR
-			if(vertex_parent == null) {
-				throw new Exception("root is reached unexpectedly");
-			} else {
-				return vertex_parent;
-			}
-		}
-	}
+	  // public method called to find Minimum key value in BST
+	  public String findMin() { return findMin(root); }
+
+	  // overloadded recursive method to perform findMin
+	  protected String findMin(Name_BSTVertex T) {
+	         if (T == null)      throw new NoSuchElementException("BST is empty, no minimum");
+	    else if (T.getLeft() == null) return T.getName();                    // this is the min
+	    else                     return findMin(T.getLeft());           // go to the left
+	  }
+
+	  // public method called to find Maximum key value in BST
+	  public String findMax() { return findMax(root); }
+
+	  // overloadded recursive method to perform findMax
+	  protected String findMax(Name_BSTVertex T) {
+	         if (T == null)       throw new NoSuchElementException("BST is empty, no maximum");
+	    else if (T.getRight() == null) return T.getName();                   // this is the max
+	    else                      return findMax(T.getRight());        // go to the right
+	  }
 	
-	//recursively returns size of tree/sub-tree from node (as root)
-	private int getSize(Name_BSTVertex node) {
-		if(node == null) {
-			return 0;
-		}
-		return getSize(node.getLeft()) + getSize(node.getRight()) + 1;
-	}
+	  // method called to search for a value v 
+	  public String search(String v) {
+	    Name_BSTVertex res = search(root, v);
+	    return res == null ? "NULL" : res.getName();
+	  }
+
+	  // overloaded recursive method to perform search
+	  protected Name_BSTVertex search(Name_BSTVertex T, String v) {
+	         if (T == null)  return null;                     // not found
+	    else if (T.getName().compareTo(v) == 0) return T;                        // found
+	    else if (T.getName().compareTo(v) < 0)  return search(T.getRight(), v);       // search to the right
+	    else                 return search(T.getLeft(), v);        // search to the left
+	  }
+	
+	  // public method to find successor to given value v in BST
+	  public String successor(String v) { 
+	    Name_BSTVertex vPos = search(root, v);
+	    return vPos == null ? "NULL" : successor(vPos);
+	  }
+
+	  // overloaded recursive method to find successor to for a given vertex T in BST
+	  protected String successor(Name_BSTVertex T) {
+	    if (T.getRight() != null)                       // this subtree has right subtree
+	      return findMin(T.getRight());  // the successor is the minimum of right subtree
+	    else {
+	      Name_BSTVertex par = T.getParent();
+	      Name_BSTVertex cur = T;
+	      // if par(ent) is not root and cur(rent) is its right children
+	      while ((par != null) && (cur == par.getRight())) {
+	        cur = par;                                         // continue moving up
+	        par = cur.getParent();
+	      }
+	      return par == null ? "NULL" : par.getName();           // this is the successor of T
+	    }
+	  }
 }
