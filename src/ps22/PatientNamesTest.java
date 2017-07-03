@@ -20,11 +20,155 @@ public class PatientNamesTest {
 
 	PatientNames exe = new PatientNames();
 	
-	File testFile = new File("D:\\Repos\\cs2010-zx\\src\\ps22\\test2.in");
-	File outputFile = new File("D:\\Repos\\cs2010-zx\\src\\ps22\\test2.out");
+	@Test
+	public void mainFile1Test() throws IOException {
+		File testFile = new File("D:\\Repos\\cs2010-zx\\src\\ps22\\test1.in");
+		File outputFile = new File("D:\\Repos\\cs2010-zx\\src\\ps22\\test1.out");
+		
+		BufferedReader br = new BufferedReader(new FileReader(testFile));
+		BufferedReader brout = new BufferedReader(new FileReader(outputFile));
+
+		PrintWriter pr = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out)));
+		
+		int counter = 1;
+		while (true) {
+			StringTokenizer st = new StringTokenizer(br.readLine());
+			int command = Integer.parseInt(st.nextToken());
+			if (command == 0) // end of input
+				break;
+			else if (command == 1) // AddPatient
+				exe.AddPatient(st.nextToken(), Integer.parseInt(st.nextToken()));
+			else if (command == 2) // RemovePatient
+				exe.RemovePatient(st.nextToken());
+			else // if (command == 3) // Query
+				assertEquals(Integer.parseInt(brout.readLine()),
+						exe.Query(st.nextToken(), // START
+						st.nextToken(), // END
+						Integer.parseInt(st.nextToken()))); // GENDER
+
+			System.out.println("INSTRUCTION " + counter++);
+			System.out.println(exe.getMaleBST());
+			System.out.println(exe.getFemaleBST());
+		}
+		
+		br.close();
+		brout.close();
+		pr.close();
+	}
 	
 	@Test
-	public void mainFileTest() throws IOException {
+	public void mainFile2Test() throws IOException {
+		File testFile = new File("D:\\Repos\\cs2010-zx\\src\\ps22\\test2.in");
+		File outputFile = new File("D:\\Repos\\cs2010-zx\\src\\ps22\\test2.out");
+		
+		BufferedReader br = new BufferedReader(new FileReader(testFile));
+		BufferedReader brout = new BufferedReader(new FileReader(outputFile));
+
+		PrintWriter pr = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out)));
+		
+		int counter = 1;
+		while (true) {
+			StringTokenizer st = new StringTokenizer(br.readLine());
+			int command = Integer.parseInt(st.nextToken());
+			if (command == 0) // end of input
+				break;
+			else if (command == 1) // AddPatient
+				exe.AddPatient(st.nextToken(), Integer.parseInt(st.nextToken()));
+			else if (command == 2) // RemovePatient
+				exe.RemovePatient(st.nextToken());
+			else // if (command == 3) // Query
+				assertEquals(Integer.parseInt(brout.readLine()),
+						exe.Query(st.nextToken(), // START
+						st.nextToken(), // END
+						Integer.parseInt(st.nextToken()))); // GENDER
+
+			System.out.println("INSTRUCTION " + counter++);
+			System.out.println(exe.getMaleBST());
+			System.out.println(exe.getFemaleBST());
+		}
+		
+		br.close();
+		brout.close();
+		pr.close();
+	}
+	
+	@Test
+	public void mainFile3Test() throws IOException {
+		File testFile = new File("D:\\Repos\\cs2010-zx\\src\\ps22\\test3.in");
+		File outputFile = new File("D:\\Repos\\cs2010-zx\\src\\ps22\\test3.out");
+		
+		BufferedReader br = new BufferedReader(new FileReader(testFile));
+		BufferedReader brout = new BufferedReader(new FileReader(outputFile));
+
+		PrintWriter pr = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out)));
+		
+		int counter = 1;
+		while (true) {
+			StringTokenizer st = new StringTokenizer(br.readLine());
+			int command = Integer.parseInt(st.nextToken());
+			if (command == 0) // end of input
+				break;
+			else if (command == 1) // AddPatient
+				exe.AddPatient(st.nextToken(), Integer.parseInt(st.nextToken()));
+			else if (command == 2) // RemovePatient
+				exe.RemovePatient(st.nextToken());
+			else // if (command == 3) // Query
+				assertEquals(Integer.parseInt(brout.readLine()),
+						exe.Query(st.nextToken(), // START
+						st.nextToken(), // END
+						Integer.parseInt(st.nextToken()))); // GENDER
+
+			System.out.println("INSTRUCTION " + counter++);
+			System.out.println(exe.getMaleBST());
+			System.out.println(exe.getFemaleBST());
+		}
+		
+		br.close();
+		brout.close();
+		pr.close();
+	}
+	
+	@Test
+	public void mainFile4Test() throws IOException {
+		File testFile = new File("D:\\Repos\\CS2010\\testcases\\ps2\\tc3.in");
+		File outputFile = new File("D:\\Repos\\CS2010\\testcases\\ps2\\tc3.out");
+		
+		BufferedReader br = new BufferedReader(new FileReader(testFile));
+		BufferedReader brout = new BufferedReader(new FileReader(outputFile));
+
+		PrintWriter pr = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out)));
+		
+		int counter = 1;
+		while (true) {
+			StringTokenizer st = new StringTokenizer(br.readLine());
+			int command = Integer.parseInt(st.nextToken());
+			if (command == 0) // end of input
+				break;
+			else if (command == 1) // AddPatient
+				exe.AddPatient(st.nextToken(), Integer.parseInt(st.nextToken()));
+			else if (command == 2) // RemovePatient
+				exe.RemovePatient(st.nextToken());
+			else // if (command == 3) // Query
+				assertEquals(Integer.parseInt(brout.readLine()),
+						exe.Query(st.nextToken(), // START
+						st.nextToken(), // END
+						Integer.parseInt(st.nextToken()))); // GENDER
+
+			System.out.println("INSTRUCTION " + counter++);
+			System.out.println(exe.getMaleBST());
+			System.out.println(exe.getFemaleBST());
+		}
+		
+		br.close();
+		brout.close();
+		pr.close();
+	}
+	
+	@Test
+	public void mainFile5Test() throws IOException {
+		File testFile = new File("D:\\Repos\\CS2010\\testcases\\ps2\\tc4.in");
+		File outputFile = new File("D:\\Repos\\CS2010\\testcases\\ps2\\tc4.out");
+		
 		BufferedReader br = new BufferedReader(new FileReader(testFile));
 		BufferedReader brout = new BufferedReader(new FileReader(outputFile));
 
@@ -59,6 +203,9 @@ public class PatientNamesTest {
 	
 	@Test
 	public void fileInputValidTest() throws IOException {
+		File testFile = new File("D:\\Repos\\cs2010-zx\\src\\ps22\\test1.in");
+		File outputFile = new File("D:\\Repos\\cs2010-zx\\src\\ps22\\test1.out");
+		
 		BufferedReader br = new BufferedReader(new FileReader(testFile));
 		int maxL = 0;
 	    int N = 0, Q = 0;
