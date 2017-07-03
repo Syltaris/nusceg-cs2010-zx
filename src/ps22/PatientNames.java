@@ -47,10 +47,10 @@ class PatientNames {
 		// --------------------------------------------
 		int ans = 0;
 		
-		System.out.println(malePatientsList.getRankBySubstring(START, true));
-		System.out.println(malePatientsList.getRankBySubstring(END, false));
-		System.out.println(femalePatientsList.getRankBySubstring(START, true));
-		System.out.println(femalePatientsList.getRankBySubstring(END, false));
+//		System.out.println(malePatientsList.getRankBySubstring(START, true));
+//		System.out.println(malePatientsList.getRankBySubstring(END, false));
+//		System.out.println(femalePatientsList.getRankBySubstring(START, true));
+//		System.out.println(femalePatientsList.getRankBySubstring(END, false));
 
 		String maleLargestName = malePatientsList.findMax();
 		String femaleLargestName = femalePatientsList.findMax();
@@ -79,9 +79,6 @@ class PatientNames {
 				ans = 1 + femalePatientsList.getRankBySubstring(END, false) - femalePatientsList.getRankBySubstring(START, true);
 			}
 		}
-		
-
-		
 		return ans;
 		// --------------------------------------------
 	}
@@ -122,7 +119,7 @@ class PatientNames {
 	}
 }
 
-class Name_BSTVertex implements Comparable<Name_BSTVertex> {
+class Name_BSTVertex {
 	private Name_BSTVertex parent, left, right;
 	private String key_name;
 	private int height;
@@ -199,8 +196,6 @@ class Name_BSTVertex implements Comparable<Name_BSTVertex> {
 		return bf < 0 ? -bf : bf;
 	}
 	
-
-	@Override
 	public int compareTo(Name_BSTVertex o) {
 		return this.key_name.compareTo(o.key_name);
 	}
@@ -289,12 +284,9 @@ class Name_BST {
 			} else {
 				if(!inclusive && vertex.getName().compareTo(keyword) > 0) {
 					rank--;
-				} 
-//				else if (inclusive && !vertex.getName().startsWith(keyword)){
-//					rank++;
-//				} else if (inclusive && !vertex.getName().startsWith(keyword)){
-//					rank++;
-//				} )
+				} else if (inclusive && vertex.getName().compareTo(keyword) <= 0) {
+					rank++;
+				}
 				rank += getSize(vertex.getLeft());
 				break;
 			}
