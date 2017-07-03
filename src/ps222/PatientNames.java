@@ -281,11 +281,9 @@ class Name_BST {
 		  
 		  while(node != null) {
 			  if(node.getLeft() != null && node.getRight() != null) {
-				  node.setHeight(1 + (max(node.getLeft().getHeight(),  node.getRight().getHeight())));
-			  }else {
-				  node.setHeight(height);
+				  height = 1 + (max(node.getLeft().getHeight(),  node.getRight().getHeight()));
 			  }
-			  height++;
+			  node.setHeight(height++);
 			  node = node.getParent();
 		  }
 	  }
