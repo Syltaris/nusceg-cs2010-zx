@@ -149,7 +149,7 @@ class Name_BSTVertex {
 	private int calculateBalanceFactor() {
 		int bf = 0;
 		if(this.getLeft() == null && this.getRight() == null) {
-			bf = -2;
+			bf = 0; // -1 + (-1)
 		} else if(this.getLeft() == null) {
 			bf = this.getRight().getHeight() + 1; // right - (-1)
 		} else if(this.getRight() == null) {
@@ -181,34 +181,59 @@ class Name_BST {
 		this.endQueryRankCache = new HashMap<String, Integer>();
 	}
 
-	  // method called to insert a new key with value v into BST
-	  public void insert(String v) { 
-		  root = insert(root, v); 
-		  this.startQueryRankCache.clear(); //invalidate cache
-		  this.endQueryRankCache.clear(); 
-	  }
+	public void insert(String name) {
+		this.startQueryRankCache.clear(); // invalidate cache
+		this.endQueryRankCache.clear();
 
-	  // overloaded recursive method to perform insertion of new vertex into BST
-	  protected Name_BSTVertex insert(Name_BSTVertex T, String v) {
-	    if (T == null) return new Name_BSTVertex(v);          // insertion point is found
+		Name_BSTVertex nodeToInsert = new Name_BSTVertex(name);
 
-	    if (T.getName().compareTo(v) < 0) {                                      // search to the right
-	      T.setRight(insert(T.getRight(), v));
-	      T.getRight().setParent(T);
-	    }
-	    else {                                                 // search to the left
-	      T.setLeft(insert(T.getLeft(), v));
-	      T.getLeft().setParent(T);
-	    }
+		if (this.root == null) {
+			root = nodeToInsert;
+		} else {
+			// traverse left, else right
+			Name_BSTVertex vertex = root, vertex_parent = null;
 
-	    return T;                                          // return the updated BST
-	  }  
+			// find insertion point
+			while (vertex != null) {
+				vertex_parent = vertex;
+				// if node value is larger than curr vertex, continue going
+				// right, else go left
+				if (vertex.compareTo(nodeToInsert) < 0) {
+					vertex = vertex.getRight();
+				} else if (vertex.compareTo(nodeToInsert) > 0) {
+					vertex = vertex.getLeft();
+				}
+			}
+
+			// insert node
+			if (vertex_parent.compareTo(nodeToInsert) < 0) {
+				vertex_parent.setRight(nodeToInsert);
+			} else {
+				vertex_parent.setLeft(nodeToInsert);
+			}
+			nodeToInsert.setParent(vertex_parent);
+
+			// update balance factor and height going up the path from leaf to root
+			updateHeightFromLeaf(nodeToInsert);
+			
+			// check and rotate
+			
+		}
+
+	} 
 
 	  // public method to delete a vertex containing key with value v from BST
 	  public void delete(String v) { 
+		  Name_BSTVertex leftNodeToUpdateFrom = search(v);
+		  Name_BSTVertex rightNodeToUpdateFrom = leftNodeToUpdateFrom.getRight();
+		  leftNodeToUpdateFrom = leftNodeToUpdateFrom.getLeft();
+		  
 		  root = delete(root, v); 
 		  this.startQueryRankCache.clear(); //invalidate cache
-		  this.endQueryRankCache.clear(); 
+		  this.endQueryRankCache.clear();
+
+		  updateHeight(leftNodeToUpdateFrom);
+		  updateHeight(rightNodeToUpdateFrom);
 	  }
 
 	  // overloaded recursive method to perform deletion 
@@ -239,7 +264,47 @@ class Name_BST {
 	    
 	    return T;                                          // return the updated BST
 	  }
-
+	  
+	  //recursively traverse down from root to leaves and update heights from there
+	  private void updateHeight(Name_BSTVertex node) {
+		  if(node == null) {
+			  return;
+		  } else if(node.getLeft() == null && node.getRight() == null) {
+			  updateHeightFromLeaf(node);
+			  return;
+		  }
+		  updateHeight(node.getLeft());
+		  updateHeight(node.getRight());
+	  }
+	  
+	  //traverse up from node to root and update all heights
+	  private void updateHeightFromLeaf(Name_BSTVertex node) {
+		  int height = 0;
+		  
+		  while(node != null) {
+			  if(node.getLeft() != null && node.getRight() != null) {
+				  node.setHeight(1 + (node.getLeft().getHeight() > node.getRight().getHeight() ? 
+						  node.getLeft().getHeight() : node.getLeft().getHeight()));
+			  }else {
+				  node.setHeight(height);
+			  }
+			  height++;
+			  node = node.getParent();
+		  }
+	  }
+	  
+	  private void rebalance() {
+		  
+	  }
+	  
+	  private void rotateRight(Name_BSTVertex leftNode, Name_BSTVertex rightNode) {
+		 
+	  }
+	  
+	  private void rotateLeft(Name_BSTVertex leftNode, Name_BSTVertex rightNode) {
+		  
+	  }
+	  
 	public int getRankBySubstring(String keyword, boolean inclusive) {
 		int rank = 1;
 		Name_BSTVertex vertex = this.root;
@@ -326,10 +391,10 @@ class Name_BST {
 	    else                      return findMax(T.getRight());        // go to the right
 	  }
 	
-	  // method called to search for a value v 
-	  public String search(String v) {
+	  // method called to search for a node v 
+	  public Name_BSTVertex search(String v) {
 	    Name_BSTVertex res = search(root, v);
-	    return res == null ? "NULL" : res.getName();
+	    return res == null ? null : res;
 	  }
 
 	  // overloaded recursive method to perform search
