@@ -1,3 +1,4 @@
+package ps22;
 
 import java.util.*;
 import java.io.*;
@@ -45,11 +46,6 @@ class PatientNames {
 	int Query(String START, String END, int gender) {
 		// --------------------------------------------
 		int ans = 0;
-		
-//		System.out.println(malePatientsList.getRankBySubstring(START, true));
-//		System.out.println(malePatientsList.getRankBySubstring(END, false));
-//		System.out.println(femalePatientsList.getRankBySubstring(START, true));
-//		System.out.println(femalePatientsList.getRankBySubstring(END, false));
 
 		String maleLargestName = malePatientsList.findMax();
 		String femaleLargestName = femalePatientsList.findMax();
@@ -133,52 +129,22 @@ class Name_BSTVertex {
 	}
 
 	// getter/setter methods
-	public Name_BSTVertex getParent() {
-		return this.parent;
-	}
-
-	public Name_BSTVertex getLeft() {
-		return this.left;
-	}
-
-	public Name_BSTVertex getRight() {
-		return this.right;
-	}
+	public Name_BSTVertex getParent() {return this.parent;}
+	public Name_BSTVertex getLeft() {return this.left;}
+	public Name_BSTVertex getRight() {return this.right;}
+	public String getName() {return this.key_name;}
+	public int getHeight() {return this.height;}
+	public int getBalance_factor() {return balance_factor;}
 	
-	public String getName() {
-		return this.key_name;
-	}
-
-	public int getHeight() {
-		return this.height;
-	}
-	public int getBalance_factor() {
-		return balance_factor;
-	}
-
-	public void setParent(Name_BSTVertex parent) {
-		this.parent = parent;
-	}
-
-	public void setLeft(Name_BSTVertex left) {
-		this.left = left;
-	}
-
-	public void setRight(Name_BSTVertex right) {
-		this.right = right;
-	}
-	
-	public void setName(String key_name) {
-		this.key_name = key_name;
-	}
-
+	public void setParent(Name_BSTVertex parent) {this.parent = parent;}
+	public void setLeft(Name_BSTVertex left) {this.left = left;}
+	public void setRight(Name_BSTVertex right) {this.right = right;}
+	public void setName(String key_name) {this.key_name = key_name;}
 	public void setHeight(int height) {
 		this.height = height;
 		this.balance_factor = calculateBalanceFactor();
 	}
-	public void setBalance_factor(int balance_factor) {
-		this.balance_factor = balance_factor;
-	}
+	public void setBalance_factor(int balance_factor) {this.balance_factor = balance_factor;}
 	
 	private int calculateBalanceFactor() {
 		int bf = 0;
@@ -194,32 +160,33 @@ class Name_BSTVertex {
 		
 		return bf < 0 ? -bf : bf;
 	}
-	
-	public int compareTo(Name_BSTVertex o) {
-		return this.key_name.compareTo(o.key_name);
-	}
+	public int compareTo(Name_BSTVertex o) {return this.key_name.compareTo(o.key_name);}
 
 	@Override
 	public String toString() {
 		String output = new String();
-		
 		output = output.concat("NAME: " + key_name +",HEIGHT: " + height+",BF: " + balance_factor);
-		
 		return output;
 	}
 }
 
 class Name_BST {
 	private Name_BSTVertex root;
-	private HashMap<String, Integer> nameRankMapCache;
+	private HashMap<String, Integer> startQueryRankCache;
+	private HashMap<String, Integer> endQueryRankCache;
 
 	public Name_BST() {
 		this.root = null;
-		this.nameRankMapCache = new HashMap<String, Integer>();
+		this.startQueryRankCache = new HashMap<String, Integer>();
+		this.endQueryRankCache = new HashMap<String, Integer>();
 	}
 
 	  // method called to insert a new key with value v into BST
-	  public void insert(String v) { root = insert(root, v); }
+	  public void insert(String v) { 
+		  root = insert(root, v); 
+		  this.startQueryRankCache.clear(); //invalidate cache
+		  this.endQueryRankCache.clear(); 
+	  }
 
 	  // overloaded recursive method to perform insertion of new vertex into BST
 	  protected Name_BSTVertex insert(Name_BSTVertex T, String v) {
@@ -238,7 +205,11 @@ class Name_BST {
 	  }  
 
 	  // public method to delete a vertex containing key with value v from BST
-	  public void delete(String v) { root = delete(root, v); }
+	  public void delete(String v) { 
+		  root = delete(root, v); 
+		  this.startQueryRankCache.clear(); //invalidate cache
+		  this.endQueryRankCache.clear(); 
+	  }
 
 	  // overloaded recursive method to perform deletion 
 	  protected Name_BSTVertex delete(Name_BSTVertex T, String v) {
@@ -273,6 +244,13 @@ class Name_BST {
 		int rank = 1;
 		Name_BSTVertex vertex = this.root;
 		
+		//if query is cached, return query
+		if(inclusive && this.startQueryRankCache.containsKey(keyword)) {
+			return this.startQueryRankCache.get(keyword);
+		} else if (!inclusive && this.endQueryRankCache.containsKey(keyword)) {
+			return this.endQueryRankCache.get(keyword);
+		}
+		
 		//while node is still lexicographically larger than keyword
 		while(vertex != null) {
 			if(vertex.getLeft() != null && vertex.getName().compareTo(keyword) > 0) {
@@ -290,6 +268,12 @@ class Name_BST {
 				break;
 			}
 		}
+		
+		if(inclusive) 
+			this.startQueryRankCache.put(keyword, rank);
+		else 
+			this.endQueryRankCache.put(keyword, rank);
+		
 		
 		return rank;
 	}
