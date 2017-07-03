@@ -206,13 +206,7 @@ class Name_BST {
 			root = nodeToInsert;
 		} else {
 			//traverse left, else right
-			Name_BSTVertex vertex = null, vertex_parent = root;
-			
-			if(this.root.compareTo(nodeToInsert) < 0) {
-				vertex = this.root.getRight();
-			} else if(this.root.compareTo(nodeToInsert) > 0) {
-				vertex = this.root.getLeft();
-			}
+			Name_BSTVertex vertex = root, vertex_parent = null;
 			
 			//find insertion point
 			while(vertex != null) {
