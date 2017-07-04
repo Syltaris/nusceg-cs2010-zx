@@ -8,65 +8,65 @@ import java.io.*;
 //year 2017 hash code: DZAjKugdE9QiOQKGFbut (do NOT delete this line)
 
 class PatientNames {
-	Name_BST malePatientsList, femalePatientsList;
-	HashMap<String, Integer> patientsGenderMap;
+	Name_BST males, females;
+	HashMap<String, Integer> genders;
 
 	public PatientNames() {
-		this.malePatientsList = new Name_BST();
-		this.femalePatientsList = new Name_BST();
-		this.patientsGenderMap = new HashMap<String, Integer>(20000); //20k patients
+		this.males = new Name_BST();
+		this.females = new Name_BST();
+		this.genders = new HashMap<String, Integer>(20000);
 	}
 
-	void AddPatient(String patientName, int gender) {
-		if(gender == 1) {
-			malePatientsList.insert(patientName);
-		} else if(gender == 2) {
-			femalePatientsList.insert(patientName);
+	void AddPatient(String name, int sex) {
+		if(sex == 1) {
+			males.insert(name);
+		} else if(sex == 2) {
+			females.insert(name);
 		}
-		patientsGenderMap.put(patientName, gender);
+		genders.put(name, sex);
 	}
 
-	void RemovePatient(String patientName) {
-		if(patientsGenderMap.get(patientName) == 1) {
-			malePatientsList.delete(patientName);
+	void RemovePatient(String name) {
+		if(genders.get(name) == 1) {
+			males.delete(name);
 		} else {
-			femalePatientsList.delete(patientName);
+			females.delete(name);
 		}
 	}
 
-	int Query(String START, String END, int gender) {
+	int Query(String START, String END, int sex) {
 		int ans = 0;
 
-		String maleLargestName;
-		String femaleLargestName;
+		String lastM;
+		String lastF;
 		
-		if(gender == 0) {
-			femaleLargestName = femalePatientsList.findMax();
-			maleLargestName = malePatientsList.findMax();
-			if(maleLargestName == null || START.compareTo(maleLargestName) > 0) {
+		if(sex == 0) {
+			lastF = females.findMax();
+			lastM = males.findMax();
+			if(lastM == null || START.compareTo(lastM) > 0) {
 				ans = 0;
 			} else {
-				ans = 1 + malePatientsList.getRankBySubstring(END, false) - malePatientsList.getRankBySubstring(START, true);
+				ans = 1 + males.getRankBySubstring(END, false) - males.getRankBySubstring(START, true);
 			}
-			if(femaleLargestName == null || START.compareTo(femaleLargestName) > 0) {
+			if(lastF == null || START.compareTo(lastF) > 0) {
 				ans += 0;
 			} else {
-				ans += 1 + femalePatientsList.getRankBySubstring(END, false) - femalePatientsList.getRankBySubstring(START, true);
+				ans += 1 + females.getRankBySubstring(END, false) - females.getRankBySubstring(START, true);
 			}
-		} else if (gender == 1) {
-			maleLargestName = malePatientsList.findMax();
-			if(maleLargestName == null || START.compareTo(maleLargestName) > 0) {
+		} else if (sex == 1) {
+			lastM = males.findMax();
+			if(lastM == null || START.compareTo(lastM) > 0) {
 				ans = 0;
 			} else {
-				maleLargestName = malePatientsList.findMax();
-				ans = 1 + malePatientsList.getRankBySubstring(END, false) - malePatientsList.getRankBySubstring(START, true);
+				lastM = males.findMax();
+				ans = 1 + males.getRankBySubstring(END, false) - males.getRankBySubstring(START, true);
 			}
 		} else {
-			femaleLargestName = femalePatientsList.findMax();
-			if(femaleLargestName == null || START.compareTo(femaleLargestName) > 0) {
+			lastF = females.findMax();
+			if(lastF == null || START.compareTo(lastF) > 0) {
 				ans = 0;
 			} else {
-				ans = 1 + femalePatientsList.getRankBySubstring(END, false) - femalePatientsList.getRankBySubstring(START, true);
+				ans = 1 + females.getRankBySubstring(END, false) - females.getRankBySubstring(START, true);
 			}
 		}
 		return ans;
@@ -98,50 +98,42 @@ class PatientNames {
 		PatientNames ps2 = new PatientNames();
 		ps2.run();
 	}
-	
-	public Name_BST getMaleBST() {
-		return this.malePatientsList;
-	}
-	
-	public Name_BST getFemaleBST() {
-		return this.femalePatientsList;
-	}
 }
 
 class Name_BSTVertex {
-	private Name_BSTVertex parent, left, right;
-	private String key_name;
-	private int height;
-	private int balance_factor;
-	private int size;
+	private Name_BSTVertex p, l, r;
+	private String key;
+	private int h;
+	private int bf;
+	private int s;
 
-	public Name_BSTVertex(String key_name) {
-		this.key_name = key_name;
-		this.left = null;
-		this.right = null;
-		this.height = 0; //assumption that vertex will always be leaf?
-		this.size = 1;
+	public Name_BSTVertex(String key) {
+		this.key = key;
+		this.l = null;
+		this.r = null;
+		this.h = 0;
+		this.s = 1;
 	}
 
 	// getter/setter methods
-	public Name_BSTVertex getParent() {return this.parent;}
-	public Name_BSTVertex getLeft() {return this.left;}
-	public Name_BSTVertex getRight() {return this.right;}
-	public String getName() {return this.key_name;}
-	public int getHeight() {return this.height;}
-	public int getBalance_factor() {return balance_factor;}
-	public int getSize() {return size;}
+	public Name_BSTVertex getParent() {return this.p;}
+	public Name_BSTVertex getLeft() {return this.l;}
+	public Name_BSTVertex getRight() {return this.r;}
+	public String getName() {return this.key;}
+	public int getHeight() {return this.h;}
+	public int getBalance_factor() {return bf;}
+	public int getSize() {return s;}
 	
-	public void setParent(Name_BSTVertex parent) {this.parent = parent;}
-	public void setLeft(Name_BSTVertex left) {this.left = left;}
-	public void setRight(Name_BSTVertex right) {this.right = right;}
-	public void setName(String key_name) {this.key_name = key_name;}
-	public void setHeight(int height) {
-		this.height = height;
-		this.balance_factor = calculateBalanceFactor();
+	public void setParent(Name_BSTVertex p) {this.p = p;}
+	public void setLeft(Name_BSTVertex l) {this.l = l;}
+	public void setRight(Name_BSTVertex r) {this.r = r;}
+	public void setName(String key) {this.key = key;}
+	public void setHeight(int h) {
+		this.h = h;
+		this.bf = calculateBalanceFactor();
 	}
-	public void setBalance_factor(int balance_factor) {this.balance_factor = balance_factor;}
-	public void setSize(int size) {this.size = size;}
+	public void setBalance_factor(int bf) {this.bf = bf;}
+	public void setSize(int size) {this.s = size;}
 	
 	private int calculateBalanceFactor() {
 		int bf = 0;
@@ -157,109 +149,75 @@ class Name_BSTVertex {
 		
 		return bf;
 	}
-	public int compareTo(Name_BSTVertex o) {return this.key_name.compareTo(o.key_name);}
-
-	@Override
-	public String toString() {
-		String output = new String();
-		output = output.concat("NAME: " + key_name +",HEIGHT: " + height+",BF: " + balance_factor+"SIZE: "+size);
-		return output;
-	}
+	public int compareTo(Name_BSTVertex o) {return this.key.compareTo(o.key);}
 }
 
 class Name_BST {
 	private Name_BSTVertex root;
-//	private HashMap<String, Integer> startQueryRankCache;
-//	private HashMap<String, Integer> endQueryRankCache;
 
-	public Name_BST() {
-		this.root = null;
-//		this.startQueryRankCache = new HashMap<String, Integer>(20000);
-//		this.endQueryRankCache = new HashMap<String, Integer>(20000);
-	}
+	public Name_BST() {this.root = null;}
 
 	public void insert(String name) {
-//		this.startQueryRankCache.clear(); // invalidate cache
-//		this.endQueryRankCache.clear();
-
-		Name_BSTVertex nodeToInsert = new Name_BSTVertex(name);
+		Name_BSTVertex node = new Name_BSTVertex(name);
 
 		if (this.root == null) {
-			root = nodeToInsert;
+			root = node;
 		} else {
-			// traverse left, else right
-			Name_BSTVertex vertex = root, vertex_parent = null;
+			Name_BSTVertex v = root, v_p = null;
 
-			// find insertion point
-			while (vertex != null) {
-				vertex_parent = vertex;
-				// if node value is larger than curr vertex, continue going
-				// right, else go left
-				if (vertex.compareTo(nodeToInsert) < 0) {
-					vertex = vertex.getRight();
-				} else if (vertex.compareTo(nodeToInsert) > 0) {
-					vertex = vertex.getLeft();
+			while (v != null) {
+				v_p = v;
+				if (v.compareTo(node) < 0) {
+					v = v.getRight();
+				} else if (v.compareTo(node) > 0) {
+					v = v.getLeft();
 				}
 			}
-
-			// insert node
-			if (vertex_parent.compareTo(nodeToInsert) < 0) {
-				vertex_parent.setRight(nodeToInsert);
+			if (v_p.compareTo(node) < 0) {
+				v_p.setRight(node);
 			} else {
-				vertex_parent.setLeft(nodeToInsert);
+				v_p.setLeft(node);
 			}
-			nodeToInsert.setParent(vertex_parent);
-
-			// update balance factor and height going up the path from leaf to root
-			updateHeightFromLeaf(nodeToInsert);
-			updateSizeFromLeaf(nodeToInsert);
-			
-			// check and rotate
-			rebalance(nodeToInsert);
+			node.setParent(v_p);
+			updateHeightFromLeaf(node);
+			updateSizeFromLeaf(node);
+			rebalance(node);
 		}
-
 	} 
 
-	  // public method to delete a vertex containing key with value v from BST
-	  public void delete(String v) { 
-		  Name_BSTVertex nodeToRebalance = search(v).getParent();
-		  
+	public void delete(String v) { 
+		  Name_BSTVertex node = search(v).getParent();  
 		  root = delete(root, v); 
-//		  this.startQueryRankCache.clear(); //invalidate cache
-//		  this.endQueryRankCache.clear();
-		  
-		  //rebalance
-		  rebalance(nodeToRebalance);
+		  rebalance(node);
 	  }
 
-	  // overloaded recursive method to perform deletion 
 	  protected Name_BSTVertex delete(Name_BSTVertex T, String v) {
-	    if (T == null)  return T;              // cannot find the item to be deleted
+	    if (T == null)  return T;
 
-	    if (T.getName().compareTo(v) < 0)                // search to the right
+	    if (T.getName().compareTo(v) < 0)   
 	      T.setRight(delete(T.getRight(), v));
-	    else if (T.getName().compareTo(v) > 0)           // search to the left
+	    else if (T.getName().compareTo(v) > 0)      
 	      T.setLeft(delete(T.getLeft(), v));
-	    else {                                            // this is the node to be deleted
-	      if (T.getLeft() == null && T.getRight() == null)                   // this is a leaf
-	        T = null;                                      // simply erase this node
-	      else if (T.getLeft() == null && T.getRight() != null) {   // only one child at right        
+	    else {                                        
+	      if (T.getLeft() == null && T.getRight() == null)           
+	        T = null;                                      
+	      else if (T.getLeft() == null && T.getRight() != null) {         
 	        T.getRight().setParent(T.getParent());
-	        T = T.getRight();                                                 // bypass T        
+	        T = T.getRight();                                             
 	      }
-	      else if (T.getLeft() != null && T.getRight() == null) {    // only one child at left        
+	      else if (T.getLeft() != null && T.getRight() == null) {      
 	        T.getLeft().setParent(T.getParent());
-	        T = T.getLeft();                                                  // bypass T        
+	        T = T.getLeft();      
 	      }
-	      else {                                 // has two children, find successor
+	      else { 
 	        String successorV = successor(v);
-	        T.setName(successorV);         // replace this key with the successor's key
-	        T.setRight(delete(T.getRight(), successorV));      // delete the old successorV
+	        T.setName(successorV);
+	        T.setRight(delete(T.getRight(), successorV));
 	      }
 	    }
 	    updateHeight(T);
 	    updateSize(T);
-	    return T;                                          // return the updated BST
+	    return T;
 	  }
 	  
 	  private void updateSizes(Name_BSTVertex node) {
@@ -274,57 +232,41 @@ class Name_BST {
 	  }
 	  
 	  private void updateSize(Name_BSTVertex node) {
-		  int size = 1;
-		  if(node == null) {
-			  return;
-		  }
-		  if(node.getLeft() != null) {
-			  size += node.getLeft().getSize();
-		  }
-		  if(node.getRight() != null) {
-			  size += node.getRight().getSize();
-		  }
-		  
-		  node.setSize(size);
+		  int s = 1;
+		  if(node == null) { return;}
+		  if(node.getLeft() != null) {s += node.getLeft().getSize();}
+		  if(node.getRight() != null) {s += node.getRight().getSize();}
+		  node.setSize(s);
 	  }
 	  
 	  private void updateSizeFromLeaf (Name_BSTVertex node) {
 		  while(node != null) {
-			  int size = 1;
-			  if(node.getLeft() != null) {
-				  size += node.getLeft().getSize();
-			  }
-			  if(node.getRight() != null) {
-				  size += node.getRight().getSize();
-			  }
-			  
-			  node.setSize(size);
+			  int s = 1;
+			  if(node.getLeft() != null) {s += node.getLeft().getSize();}
+			  if(node.getRight() != null) {s += node.getRight().getSize();}
+			  node.setSize(s);
 			  node = node.getParent();
 		  }
 	  }
 	  
 	  private void updateHeight(Name_BSTVertex node) {
-		  int height = 1;
-		  if(node == null) {
-			  return;
-		  }
-		  
+		  int h = 1;
+		  if(node == null) {return;}
 		  if(node.getLeft() != null && node.getRight() != null) {
-			  height += (max(node.getLeft().getHeight(),  node.getRight().getHeight()));
+			  h += (max(node.getLeft().getHeight(),  node.getRight().getHeight()));
 		  } else if (node.getRight() != null) {
-			  height += node.getRight().getHeight();
+			  h += node.getRight().getHeight();
 		  } else if (node.getLeft() != null){
-			  height += node.getLeft().getHeight();
+			  h += node.getLeft().getHeight();
 		  } else {
-			  height = 0;
+			  h = 0;
 		  }
-		  node.setHeight(height);
+		  node.setHeight(h);
 	  }
 	  
 	  //traverse up from node to root and update all heights
 	  private void updateHeightFromLeaf(Name_BSTVertex node) {
 		  int height = 0;
-		  
 		  while(node != null) {
 			  if(node.getLeft() != null && node.getRight() != null) {
 				  height = 1 + (max(node.getLeft().getHeight(),  node.getRight().getHeight()));
@@ -429,18 +371,10 @@ class Name_BST {
 
 	  private int max(int a, int b) {return a > b ? a : b;}
 	  
-	public int getRankBySubstring(String keyword, boolean inclusive) {
+	public int getRankBySubstring(String keyword, boolean start) {
 		int rank = 1;
 		Name_BSTVertex vertex = this.root;
-		
-//		//if query is cached, return query
-//		if(inclusive && this.startQueryRankCache.containsKey(keyword)) {
-//			return this.startQueryRankCache.get(keyword);
-//		} else if (!inclusive && this.endQueryRankCache.containsKey(keyword)) {
-//			return this.endQueryRankCache.get(keyword);
-//		}
-		
-		//while node is still lexicographically larger than keyword
+
 		while(vertex != null) {
 			if(vertex.getLeft() != null && vertex.getName().compareTo(keyword) > 0) {
 				vertex = vertex.getLeft();
@@ -448,74 +382,36 @@ class Name_BST {
 				rank += 1 + (vertex.getLeft() != null ? vertex.getLeft().getSize() : 0);
 				vertex = vertex.getRight();
 			} else {
-				if(!inclusive && vertex.getName().compareTo(keyword) >= 0) {
+				if(!start && vertex.getName().compareTo(keyword) >= 0) {
 					rank--;
-				} else if (inclusive && vertex.getName().compareTo(keyword) < 0) {
+				} else if (start && vertex.getName().compareTo(keyword) < 0) {
 					rank++;
 				}
 				rank += (vertex.getLeft() != null ? vertex.getLeft().getSize() : 0);
 				break;
 			}
 		}
-		
-//		if(inclusive) 
-//			this.startQueryRankCache.put(keyword, rank);
-//		else 
-//			this.endQueryRankCache.put(keyword, rank);
-
 		return rank;
 	}
-	
-	//recursively returns size of tree/sub-tree from node (as root)
-	private int getSize(Name_BSTVertex node) {
-		if(node == null) {return 0;}
-		return getSize(node.getLeft()) + getSize(node.getRight()) + 1;
-	}
-	
-	@Override
-	public String toString() {
-		String output = new String();
-		inorderTraversalPrint(this.root);
-		return output;
-	}
-	
-	public int inorderTraversalPrint(Name_BSTVertex node) {
-		if(node == null) {
-			return -1;
-		}
-		
-		inorderTraversalPrint(node.getLeft()); //if came out from left child		
-		System.out.println("NODE IS:" + node);
-		return inorderTraversalPrint(node.getRight()); //pass on to the successor
-	}
-	
-	  // public method called to find Minimum key value in BST
-	  public String findMin() { return findMin(root); }
 
-	  // overloadded recursive method to perform findMin
+	  public String findMin() { return findMin(root); }
 	  protected String findMin(Name_BSTVertex T) {
 	         if (T == null)      return null;
 	    else if (T.getLeft() == null) return T.getName();                    // this is the min
 	    else                     return findMin(T.getLeft());           // go to the left
 	  }
 
-	  // public method called to find Maximum key value in BST
 	  public String findMax() { return findMax(root); }
-
-	  // overloadded recursive method to perform findMax
 	  protected String findMax(Name_BSTVertex T) {
 	         if (T == null)       return null;
 	    else if (T.getRight() == null) return T.getName();                   // this is the max
 	    else                      return findMax(T.getRight());        // go to the right
 	  }
 	
-	  // method called to search for a node v 
 	  public Name_BSTVertex search(String v) {
 	    Name_BSTVertex res = search(root, v);
 	    return res == null ? null : res;
 	  }
-
-	  // overloaded recursive method to perform search
 	  protected Name_BSTVertex search(Name_BSTVertex T, String v) {
 	         if (T == null)  return null;                     // not found
 	    else if (T.getName().compareTo(v) == 0) return T;                        // found
@@ -523,13 +419,11 @@ class Name_BST {
 	    else                 return search(T.getLeft(), v);        // search to the left
 	  }
 	
-	  // public method to find successor to given value v in BST
+
 	  public String successor(String v) { 
 	    Name_BSTVertex vPos = search(root, v);
 	    return vPos == null ? "NULL" : successor(vPos);
 	  }
-
-	  // overloaded recursive method to find successor to for a given vertex T in BST
 	  protected String successor(Name_BSTVertex T) {
 	    if (T.getRight() != null)                       // this subtree has right subtree
 	      return findMin(T.getRight());  // the successor is the minimum of right subtree
