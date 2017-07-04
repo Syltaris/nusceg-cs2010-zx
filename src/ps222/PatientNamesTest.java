@@ -16,14 +16,18 @@ import java.util.TreeSet;
 
 import org.junit.Test;
 
+
+
 public class PatientNamesTest {
 
+	public static final String filePath = "C:\\Users\\sylta\\Documents\\Git Repositories\\cs2010-zx\\src\\ps222\\";
+	
 	PatientNames exe = new PatientNames();
 	
 	@Test
 	public void mainFile1Test() throws IOException {
-		File testFile = new File("D:\\Repos\\cs2010-zx\\src\\ps222\\test1.in");
-		File outputFile = new File("D:\\Repos\\cs2010-zx\\src\\ps222\\test1.out");
+		File testFile = new File(filePath + "test1.in");
+		File outputFile = new File(filePath + "test1.out");
 		
 		BufferedReader br = new BufferedReader(new FileReader(testFile));
 		BufferedReader brout = new BufferedReader(new FileReader(outputFile));
@@ -58,8 +62,8 @@ public class PatientNamesTest {
 	
 	@Test
 	public void mainFile2Test() throws IOException {
-		File testFile = new File("D:\\Repos\\cs2010-zx\\src\\ps222\\test2.in");
-		File outputFile = new File("D:\\Repos\\cs2010-zx\\src\\ps222\\test2.out");
+		File testFile = new File(filePath + "test2.in");
+		File outputFile = new File(filePath + "test2.out");
 		
 		BufferedReader br = new BufferedReader(new FileReader(testFile));
 		BufferedReader brout = new BufferedReader(new FileReader(outputFile));
@@ -94,8 +98,8 @@ public class PatientNamesTest {
 	
 	@Test
 	public void mainFile3Test() throws IOException {
-		File testFile = new File("D:\\Repos\\cs2010-zx\\src\\ps222\\test3.in");
-		File outputFile = new File("D:\\Repos\\cs2010-zx\\src\\ps222\\test3.out");
+		File testFile = new File(filePath + "test3.in");
+		File outputFile = new File(filePath + "test3.out");
 		
 		BufferedReader br = new BufferedReader(new FileReader(testFile));
 		BufferedReader brout = new BufferedReader(new FileReader(outputFile));
@@ -130,8 +134,8 @@ public class PatientNamesTest {
 	
 	@Test
 	public void mainFile4Test() throws IOException {
-		File testFile = new File("D:\\Repos\\CS2010\\testcases\\ps2\\tc3.in");
-		File outputFile = new File("D:\\Repos\\CS2010\\testcases\\ps2\\tc3.out");
+		File testFile = new File(filePath + "test4.in");
+		File outputFile = new File(filePath + "test4.out");
 		
 		BufferedReader br = new BufferedReader(new FileReader(testFile));
 		BufferedReader brout = new BufferedReader(new FileReader(outputFile));
@@ -166,8 +170,8 @@ public class PatientNamesTest {
 	
 	@Test
 	public void mainFile5Test() throws IOException {
-		File testFile = new File("D:\\Repos\\CS2010\\testcases\\ps2\\tc4.in");
-		File outputFile = new File("D:\\Repos\\CS2010\\testcases\\ps2\\tc4.out");
+		File testFile = new File(filePath + "test5.in");
+		File outputFile = new File(filePath + "test5.out");
 		
 		BufferedReader br = new BufferedReader(new FileReader(testFile));
 		BufferedReader brout = new BufferedReader(new FileReader(outputFile));
@@ -203,8 +207,8 @@ public class PatientNamesTest {
 	
 	@Test
 	public void fileInputValidTest() throws IOException {
-		File testFile = new File("D:\\Repos\\cs2010-zx\\src\\ps222\\test1.in");
-		File outputFile = new File("D:\\Repos\\cs2010-zx\\src\\ps222\\test1.out");
+		File testFile = new File(filePath + "test1.in");
+		File outputFile = new File(filePath + "test1.out");
 		
 		BufferedReader br = new BufferedReader(new FileReader(testFile));
 		int maxL = 0;

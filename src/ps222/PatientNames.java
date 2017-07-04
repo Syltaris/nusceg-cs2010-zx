@@ -1,4 +1,3 @@
-package ps222;
 
 import java.util.*;
 import java.io.*;
@@ -9,48 +8,41 @@ import java.io.*;
 //year 2017 hash code: DZAjKugdE9QiOQKGFbut (do NOT delete this line)
 
 class PatientNames {
-	// --------------------------------------------
 	Name_BST malePatientsList, femalePatientsList;
 	HashMap<String, Integer> patientsGenderMap;
-	// --------------------------------------------
 
 	public PatientNames() {
-		// --------------------------------------------
 		this.malePatientsList = new Name_BST();
 		this.femalePatientsList = new Name_BST();
 		this.patientsGenderMap = new HashMap<String, Integer>(20000); //20k patients
-		// --------------------------------------------
 	}
 
 	void AddPatient(String patientName, int gender) {
-		// --------------------------------------------
 		if(gender == 1) {
 			malePatientsList.insert(patientName);
 		} else if(gender == 2) {
 			femalePatientsList.insert(patientName);
 		}
 		patientsGenderMap.put(patientName, gender);
-		// --------------------------------------------
 	}
 
 	void RemovePatient(String patientName) {
-		// --------------------------------------------
 		if(patientsGenderMap.get(patientName) == 1) {
 			malePatientsList.delete(patientName);
 		} else {
 			femalePatientsList.delete(patientName);
 		}
-		// --------------------------------------------
 	}
 
 	int Query(String START, String END, int gender) {
-		// --------------------------------------------
 		int ans = 0;
 
-		String maleLargestName = malePatientsList.findMax();
-		String femaleLargestName = femalePatientsList.findMax();
+		String maleLargestName;
+		String femaleLargestName;
 		
 		if(gender == 0) {
+			femaleLargestName = femalePatientsList.findMax();
+			maleLargestName = malePatientsList.findMax();
 			if(maleLargestName == null || START.compareTo(maleLargestName) > 0) {
 				ans = 0;
 			} else {
@@ -62,12 +54,15 @@ class PatientNames {
 				ans += 1 + femalePatientsList.getRankBySubstring(END, false) - femalePatientsList.getRankBySubstring(START, true);
 			}
 		} else if (gender == 1) {
+			maleLargestName = malePatientsList.findMax();
 			if(maleLargestName == null || START.compareTo(maleLargestName) > 0) {
 				ans = 0;
 			} else {
+				maleLargestName = malePatientsList.findMax();
 				ans = 1 + malePatientsList.getRankBySubstring(END, false) - malePatientsList.getRankBySubstring(START, true);
 			}
 		} else {
+			femaleLargestName = femalePatientsList.findMax();
 			if(femaleLargestName == null || START.compareTo(femaleLargestName) > 0) {
 				ans = 0;
 			} else {
@@ -75,7 +70,6 @@ class PatientNames {
 			}
 		}
 		return ans;
-		// --------------------------------------------
 	}
 
 	void run() throws Exception {
@@ -119,12 +113,14 @@ class Name_BSTVertex {
 	private String key_name;
 	private int height;
 	private int balance_factor;
+	private int size;
 
 	public Name_BSTVertex(String key_name) {
 		this.key_name = key_name;
 		this.left = null;
 		this.right = null;
 		this.height = 0; //assumption that vertex will always be leaf?
+		this.size = 1;
 	}
 
 	// getter/setter methods
@@ -134,6 +130,7 @@ class Name_BSTVertex {
 	public String getName() {return this.key_name;}
 	public int getHeight() {return this.height;}
 	public int getBalance_factor() {return balance_factor;}
+	public int getSize() {return size;}
 	
 	public void setParent(Name_BSTVertex parent) {this.parent = parent;}
 	public void setLeft(Name_BSTVertex left) {this.left = left;}
@@ -144,6 +141,7 @@ class Name_BSTVertex {
 		this.balance_factor = calculateBalanceFactor();
 	}
 	public void setBalance_factor(int balance_factor) {this.balance_factor = balance_factor;}
+	public void setSize(int size) {this.size = size;}
 	
 	private int calculateBalanceFactor() {
 		int bf = 0;
@@ -164,25 +162,25 @@ class Name_BSTVertex {
 	@Override
 	public String toString() {
 		String output = new String();
-		output = output.concat("NAME: " + key_name +",HEIGHT: " + height+",BF: " + balance_factor);
+		output = output.concat("NAME: " + key_name +",HEIGHT: " + height+",BF: " + balance_factor+"SIZE: "+size);
 		return output;
 	}
 }
 
 class Name_BST {
 	private Name_BSTVertex root;
-	private HashMap<String, Integer> startQueryRankCache;
-	private HashMap<String, Integer> endQueryRankCache;
+//	private HashMap<String, Integer> startQueryRankCache;
+//	private HashMap<String, Integer> endQueryRankCache;
 
 	public Name_BST() {
 		this.root = null;
-		this.startQueryRankCache = new HashMap<String, Integer>(20000);
-		this.endQueryRankCache = new HashMap<String, Integer>(20000);
+//		this.startQueryRankCache = new HashMap<String, Integer>(20000);
+//		this.endQueryRankCache = new HashMap<String, Integer>(20000);
 	}
 
 	public void insert(String name) {
-		this.startQueryRankCache.clear(); // invalidate cache
-		this.endQueryRankCache.clear();
+//		this.startQueryRankCache.clear(); // invalidate cache
+//		this.endQueryRankCache.clear();
 
 		Name_BSTVertex nodeToInsert = new Name_BSTVertex(name);
 
@@ -214,6 +212,7 @@ class Name_BST {
 
 			// update balance factor and height going up the path from leaf to root
 			updateHeightFromLeaf(nodeToInsert);
+			updateSizeFromLeaf(nodeToInsert);
 			
 			// check and rotate
 			rebalance(nodeToInsert);
@@ -223,16 +222,14 @@ class Name_BST {
 
 	  // public method to delete a vertex containing key with value v from BST
 	  public void delete(String v) { 
-		  Name_BSTVertex leftNodeToUpdateFrom = search(v);
-		  Name_BSTVertex rightNodeToUpdateFrom = leftNodeToUpdateFrom.getRight();
-		  leftNodeToUpdateFrom = leftNodeToUpdateFrom.getLeft();
+		  Name_BSTVertex nodeToRebalance = search(v).getParent();
 		  
 		  root = delete(root, v); 
-		  this.startQueryRankCache.clear(); //invalidate cache
-		  this.endQueryRankCache.clear();
-
-		  updateHeight(leftNodeToUpdateFrom);
-		  updateHeight(rightNodeToUpdateFrom);
+//		  this.startQueryRankCache.clear(); //invalidate cache
+//		  this.endQueryRankCache.clear();
+		  
+		  //rebalance
+		  rebalance(nodeToRebalance);
 	  }
 
 	  // overloaded recursive method to perform deletion 
@@ -260,19 +257,68 @@ class Name_BST {
 	        T.setRight(delete(T.getRight(), successorV));      // delete the old successorV
 	      }
 	    }
+	    updateHeight(T);
+	    updateSize(T);
 	    return T;                                          // return the updated BST
 	  }
 	  
-	  //recursively traverse down from root to leaves and update heights from there
-	  private void updateHeight(Name_BSTVertex node) {
+	  private void updateSizes(Name_BSTVertex node) {
 		  if(node == null) {
 			  return;
 		  } else if(node.getLeft() == null && node.getRight() == null) {
-			  updateHeightFromLeaf(node);
+			  updateSizeFromLeaf(node);
 			  return;
 		  }
-		  updateHeight(node.getLeft());
-		  updateHeight(node.getRight());
+		  updateSizes(node.getLeft());
+		  updateSizes(node.getRight());
+	  }
+	  
+	  private void updateSize(Name_BSTVertex node) {
+		  int size = 1;
+		  if(node == null) {
+			  return;
+		  }
+		  if(node.getLeft() != null) {
+			  size += node.getLeft().getSize();
+		  }
+		  if(node.getRight() != null) {
+			  size += node.getRight().getSize();
+		  }
+		  
+		  node.setSize(size);
+	  }
+	  
+	  private void updateSizeFromLeaf (Name_BSTVertex node) {
+		  while(node != null) {
+			  int size = 1;
+			  if(node.getLeft() != null) {
+				  size += node.getLeft().getSize();
+			  }
+			  if(node.getRight() != null) {
+				  size += node.getRight().getSize();
+			  }
+			  
+			  node.setSize(size);
+			  node = node.getParent();
+		  }
+	  }
+	  
+	  private void updateHeight(Name_BSTVertex node) {
+		  int height = 1;
+		  if(node == null) {
+			  return;
+		  }
+		  
+		  if(node.getLeft() != null && node.getRight() != null) {
+			  height += (max(node.getLeft().getHeight(),  node.getRight().getHeight()));
+		  } else if (node.getRight() != null) {
+			  height += node.getRight().getHeight();
+		  } else if (node.getLeft() != null){
+			  height += node.getLeft().getHeight();
+		  } else {
+			  height = 0;
+		  }
+		  node.setHeight(height);
 	  }
 	  
 	  //traverse up from node to root and update all heights
@@ -288,28 +334,31 @@ class Name_BST {
 		  }
 	  }
 	  
+	  //recursively traverse down from root to leaves and update heights from there
+	  private void updateHeights(Name_BSTVertex node) {
+		  if(node == null) {
+			  return;
+		  } else if(node.getLeft() == null && node.getRight() == null) {
+			  updateHeightFromLeaf(node);
+			  return;
+		  }
+		  updateHeights(node.getLeft());
+		  updateHeights(node.getRight());
+	  }
+	  
 	  private void rebalance(Name_BSTVertex node) {
 		  while(node != null) {
 			  if(node.getBalance_factor() == 2 && node.getLeft() != null && node.getLeft().getBalance_factor() == 1) {
 				  rotateRight(node);
-				  updateHeight(node);
-
 			  } else if(node.getBalance_factor() == 2 && node.getLeft() != null && node.getLeft().getBalance_factor() == -1) {
 				  rotateLeft(node.getLeft());
 				  rotateRight(node);
-				  updateHeight(node);
-
 			  } else if(node.getBalance_factor() == -2 && node.getRight() != null && node.getRight().getBalance_factor() == -1) {
 				  rotateLeft(node);
-				  updateHeight(node);
-
 			  } else if(node.getBalance_factor() == -2 && node.getRight() != null && node.getRight().getBalance_factor() == 1) {
 				  rotateRight(node.getRight());
 				  rotateLeft(node);
-				  updateHeight(node);
-
 			  }
-			  
 			  node = node.getParent();
 		  }
 	  }
@@ -341,6 +390,8 @@ class Name_BST {
 			  this.root = right;
 		  }
 		  
+		  updateHeights(right);
+		  updateSizes(right);
 		  return right;
 	  }
 	  
@@ -371,6 +422,8 @@ class Name_BST {
 			  this.root = left;
 		  }
 		  
+		  updateHeights(left);
+		  updateSizes(left);
 		  return left;
 	  }
 
@@ -380,19 +433,19 @@ class Name_BST {
 		int rank = 1;
 		Name_BSTVertex vertex = this.root;
 		
-		//if query is cached, return query
-		if(inclusive && this.startQueryRankCache.containsKey(keyword)) {
-			return this.startQueryRankCache.get(keyword);
-		} else if (!inclusive && this.endQueryRankCache.containsKey(keyword)) {
-			return this.endQueryRankCache.get(keyword);
-		}
+//		//if query is cached, return query
+//		if(inclusive && this.startQueryRankCache.containsKey(keyword)) {
+//			return this.startQueryRankCache.get(keyword);
+//		} else if (!inclusive && this.endQueryRankCache.containsKey(keyword)) {
+//			return this.endQueryRankCache.get(keyword);
+//		}
 		
 		//while node is still lexicographically larger than keyword
 		while(vertex != null) {
 			if(vertex.getLeft() != null && vertex.getName().compareTo(keyword) > 0) {
 				vertex = vertex.getLeft();
 			} else if(vertex.getRight() != null && (vertex.getName().compareTo(keyword) < 0)) {
-				rank += 1 + getSize(vertex.getLeft());
+				rank += 1 + (vertex.getLeft() != null ? vertex.getLeft().getSize() : 0);
 				vertex = vertex.getRight();
 			} else {
 				if(!inclusive && vertex.getName().compareTo(keyword) >= 0) {
@@ -400,15 +453,15 @@ class Name_BST {
 				} else if (inclusive && vertex.getName().compareTo(keyword) < 0) {
 					rank++;
 				}
-				rank += getSize(vertex.getLeft());
+				rank += (vertex.getLeft() != null ? vertex.getLeft().getSize() : 0);
 				break;
 			}
 		}
 		
-		if(inclusive) 
-			this.startQueryRankCache.put(keyword, rank);
-		else 
-			this.endQueryRankCache.put(keyword, rank);
+//		if(inclusive) 
+//			this.startQueryRankCache.put(keyword, rank);
+//		else 
+//			this.endQueryRankCache.put(keyword, rank);
 
 		return rank;
 	}
