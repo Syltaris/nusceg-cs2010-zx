@@ -1,0 +1,64 @@
+package ps3;
+
+import static org.junit.Assert.*;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.util.StringTokenizer;
+
+import org.junit.Test;
+
+public class HospitalRenovationTest {
+
+	public static final String filepath = "C:\\Users\\sylta\\Documents\\Git Repositories\\cs2010-zx\\src\\ps3";
+	
+	private int V; // number of vertices in the graph (number of rooms in the hospital)
+	private int[][] AdjMatrix; // the graph (the hospital)
+	private int[] RatingScore; // the weight of each vertex (rating score of each room)
+
+	HospitalRenovation exe = new HospitalRenovation();
+	
+	
+	@Test
+	public void mainFileTest() throws IOException {
+		
+		File inputFile = new File(filepath + "test1.in");
+		File outputFile = new File(filepath + "test1.in");
+
+		
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		PrintWriter pr = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out)));
+		int TC = Integer.parseInt(br.readLine()); // there will be several test cases
+		while (TC-- > 0) {
+			br.readLine(); // ignore dummy blank line
+			V = Integer.parseInt(br.readLine());
+
+			StringTokenizer st = new StringTokenizer(br.readLine());
+			// read rating scores, A (index 0), B (index 1), C (index 2), ..., until the
+			// V-th index
+			RatingScore = new int[V];
+			for (int i = 0; i < V; i++)
+				RatingScore[i] = Integer.parseInt(st.nextToken());
+
+			// clear the graph and read in a new graph as Adjacency Matrix
+			AdjMatrix = new int[V][V];
+			for (int i = 0; i < V; i++) {
+				st = new StringTokenizer(br.readLine());
+				int k = Integer.parseInt(st.nextToken());
+				while (k-- > 0) {
+					int j = Integer.parseInt(st.nextToken());
+					AdjMatrix[i][j] = 1; // edge weight is always 1 (the weight is on vertices now)
+				}
+			}
+
+			pr.println(exe.Query());
+		}
+		pr.close();
+	}
+
+}
