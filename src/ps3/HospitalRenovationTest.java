@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -26,12 +27,12 @@ public class HospitalRenovationTest {
 	
 	@Test
 	public void mainFileTest() throws IOException {
-		
 		File inputFile = new File(filepath + "test1.in");
 		File outputFile = new File(filepath + "test1.in");
 
-		
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		BufferedReader br = new BufferedReader(new FileReader(inputFile));
+		BufferedReader brout = new BufferedReader(new FileReader(outputFile));
+
 		PrintWriter pr = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out)));
 		int TC = Integer.parseInt(br.readLine()); // there will be several test cases
 		while (TC-- > 0) {
@@ -55,8 +56,7 @@ public class HospitalRenovationTest {
 					AdjMatrix[i][j] = 1; // edge weight is always 1 (the weight is on vertices now)
 				}
 			}
-
-			pr.println(exe.Query());
+			assertEquals(Integer.parseInt(brout.readLine()), exe.Query());
 		}
 		pr.close();
 	}
