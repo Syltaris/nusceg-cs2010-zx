@@ -10,36 +10,11 @@ import java.io.*;
 
 class HospitalRenovation {
 	private int V; // number of vertices in the graph (number of rooms in the hospital)
-	private int[][] AdjMatrix; // the graph (the hospital)
-	private int[] RatingScore; // the weight of each vertex (rating score of each room)
+	private Weighted_UDGraph adjList; // the graph (the hospital)
+	private ArrayList<Integer> RatingScore; // the weight of each vertex (rating score of each room)
 
-	// if needed, declare a private data structure here that
-	// is accessible to all methods in this class
-
-	public HospitalRenovation() {
-		// Write necessary code during construction
-		//
-		// write your answer here
-
-	}
-
-	int Query() {
-		int ans = 0;
-
-		// You have to report the rating score of the critical room (vertex)
-		// with the lowest rating score in this hospital
-		//
-		// or report -1 if that hospital has no critical room
-		//
-		// write your answer here
-
-		return ans;
-	}
-
-	// You can add extra function if needed
-	// --------------------------------------------
-
-	// --------------------------------------------
+	public HospitalRenovation() {}
+	int Query() {return adjList.MinAPFinder();}
 
 	void run() throws Exception {
 		// for this PS3, you can alter this method as you see fit
@@ -54,22 +29,22 @@ class HospitalRenovation {
 			StringTokenizer st = new StringTokenizer(br.readLine());
 			// read rating scores, A (index 0), B (index 1), C (index 2), ..., until the
 			// V-th index
-			RatingScore = new int[V];
+			RatingScore = new ArrayList<Integer>(V);
 			for (int i = 0; i < V; i++)
-				RatingScore[i] = Integer.parseInt(st.nextToken());
+				RatingScore.add(Integer.parseInt(st.nextToken()));
 
 			// clear the graph and read in a new graph as Adjacency Matrix
-			AdjMatrix = new int[V][V];
+			adjList = new Weighted_UDGraph(V, RatingScore);
 			for (int i = 0; i < V; i++) {
 				st = new StringTokenizer(br.readLine());
 				int k = Integer.parseInt(st.nextToken());
 				while (k-- > 0) {
 					int j = Integer.parseInt(st.nextToken());
-					AdjMatrix[i][j] = 1; // edge weight is always 1 (the weight is on vertices now)
+					adjList.insert(i,j); // edge weight is always 1 (the weight is on vertices now)
 				}
 			}
-
 			pr.println(Query());
+			Time.time = 0;
 		}
 		pr.close();
 	}
@@ -81,15 +56,77 @@ class HospitalRenovation {
 	}
 }
 
-class IntegerPair implements Comparable<IntegerPair> {
-	Integer _first, _second;
-	public IntegerPair(Integer f, Integer s) {_first = f;_second = s;}
-	public int compareTo(IntegerPair o) {
-		if (!this.first().equals(o.first()))
-			return this.first() - o.first();
-		else
-			return this.second() - o.second();
+class Time {
+	public static int time = 0;
+}
+
+class Weighted_UDGraph {
+	ArrayList<LinkedList<Integer>> adjList;
+	ArrayList<Integer> RatingScore;
+	
+	public Weighted_UDGraph (int size, ArrayList<Integer> RatingScore) {
+		this.RatingScore = RatingScore;
+		this.adjList = new ArrayList<LinkedList<Integer>>(size);
+		for(int i=0; i<size; i++)
+			this.adjList.add(new LinkedList<Integer>());
 	}
-	Integer first() {return _first;}
-	Integer second() {return _second;}
+	
+	public void insert(int vertex, int neighbour) {
+		adjList.get(vertex).add(neighbour);
+		adjList.get(neighbour).add(vertex);
+	}
+	
+	//returns list of Articulation Points
+	public int MinAPFinder() {
+		boolean[] visited = new boolean[adjList.size()];
+		int[] parents = new int[adjList.size()];
+		int[] discTime = new int[adjList.size()];
+		int[] minDiscTime = new int[adjList.size()];
+		int[] ans = {-1};
+		
+		for(int i=0; i<adjList.size(); i++) {
+			visited[i] = false;
+			parents[i] = -1;
+		}
+		
+		for(int i=0; i<adjList.size(); i++) {
+			if(visited[i] == false) {
+				DFS_MinAPFind(i, parents, visited, discTime, minDiscTime, ans);
+			}
+		}
+		
+		return ans[0];
+	}
+	
+	private void DFS_MinAPFind(int vertexIndex, int[] parents, boolean[] visited, int[] discTime, int[] minDiscTime, int[] ans) {
+		Iterator<Integer> neighbours = adjList.get(vertexIndex).iterator();
+		int noOfChildren = 0;
+		
+		visited[vertexIndex] = true; //mark as visited
+		discTime[vertexIndex] = Time.time; //assign disc times
+		minDiscTime[vertexIndex] = Time.time++;
+		
+		while(neighbours.hasNext()) {
+			int neighbourIndex = neighbours.next();
+			if(!visited[neighbourIndex]) {
+				
+				noOfChildren++;
+				parents[neighbourIndex] = vertexIndex;
+				DFS_MinAPFind(neighbourIndex, parents, visited, discTime, minDiscTime, ans);
+
+				minDiscTime[vertexIndex] = Math.min(minDiscTime[neighbourIndex], minDiscTime[vertexIndex]);
+				
+				if((parents[vertexIndex] == -1 && noOfChildren >= 2) 
+						|| (parents[vertexIndex] != -1 && minDiscTime[neighbourIndex] >= discTime[vertexIndex])) {
+					if(ans[0] == -1) {
+						ans[0] = RatingScore.get(vertexIndex);
+					} else if(ans[0] > RatingScore.get(vertexIndex)) {
+						ans[0] = RatingScore.get(vertexIndex);
+					}
+				}
+			} else if (neighbourIndex != parents[vertexIndex]){
+				minDiscTime[vertexIndex] = Math.min(discTime[neighbourIndex], minDiscTime[vertexIndex]);           
+			}
+		}
+	}
 }
