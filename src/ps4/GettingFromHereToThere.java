@@ -5,7 +5,7 @@ import java.io.*;
 
 // write your matric number here: A0138915X
 // write your name here: Chong Ze Xuan
-// write list of collaborators here: Clarence Chee, Tan Hong Yu, Chee Yeo, Kelvin, Zachary Foo, 
+// write list of collaborators here: Clarence Chee, Tan Hong Yu, Chee Yeo, Kelvin, Zachary Foo
 // year 2017 hash code: x4gxK7xzMSlNvFsMEUVn (do NOT delete this line)
 
 class GettingFromHereToThere {
@@ -15,7 +15,7 @@ class GettingFromHereToThere {
   // if needed, declare a private data structure here that
   // is accessible to all methods in this class
   // --------------------------------------------
-
+  
 
 
   // --------------------------------------------
@@ -24,7 +24,7 @@ class GettingFromHereToThere {
     // Write necessary codes during construction;
     //
     // write your answer here
-
+	  
 
 
   }
@@ -43,6 +43,7 @@ class GettingFromHereToThere {
     // which has the highest effort rating in the easiest path from source to destination for the wheelchair bound
     //
     // write your answer here
+    // get MST first, then store parents as well, to find max we traverse up the path and get the max val
 
 
 
@@ -95,7 +96,13 @@ class GettingFromHereToThere {
   }
 }
 
-
+class MST {
+	private PriorityQueue<IntegerPair> queue ;
+	
+	public MST(ArrayList <ArrayList<IntegerPair>> AdjList) {
+		
+	}
+}
 
 class IntegerScanner { // coded by Ian Leow, using any other I/O method is not recommended
   BufferedInputStream bis;
