@@ -1,4 +1,4 @@
-package ps222;
+package ps2;
 
 import java.util.*;
 import java.io.*;
