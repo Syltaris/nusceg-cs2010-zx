@@ -64,7 +64,9 @@ class GettingFromHereToThere {
 class MST {
 	private PriorityQueue<IntegerPair> queue; //(weight, vertex)
 	private ArrayList<Boolean> taken;
+	private ArrayList<Integer> parentOf;
 	ArrayList <ArrayList<IntegerPair>> adjList;
+	private ArrayList<Integer> endpoints;
 	private int[][] maximin;
 	
 	
@@ -72,10 +74,13 @@ class MST {
 		this.adjList = adjList;
 		this.queue = new PriorityQueue<IntegerPair>();
 		this.taken = new ArrayList<Boolean>(adjList.size());
+		this.parentOf = new ArrayList<Integer>(adjList.size());
+		this.endpoints = new ArrayList<Integer>();
 		this.maximin = new int[Math.min(adjList.size(), 10)][adjList.size()];
 
 		for(int i = 0; i < adjList.size(); i++) {
 			taken.add(false);
+			parentOf.add(-1);
 		}
 		
 		preprocess();
@@ -86,54 +91,73 @@ class MST {
 		
 		while(!queue.isEmpty()) {
 			IntegerPair node = queue.poll();
-			System.out.println("NOW TRAVERSING " + node.second());
-
+			
 			if(!taken.get(node.second())) {
 				process(node.second());
 			}
 		}
 		
+		Iterator parentList = parentOf.iterator();
+		int iiii =0 ;
+		while(parentList.hasNext()) {
+			System.out.println("PARENT OF "+ iiii++ +" IS " + parentList.next());
+		}
+		
 		//assumes MST is already created, returns array based on MST and parent array
 		for(int i=0; i<Math.min(10, adjList.size()); i++) {//source
-			
+			Iterator<Integer> ends = endpoints.iterator();
+							
+			while(ends.hasNext()) {
+				int endVertex = ends.next();
+				findAllMax(endVertex,endVertex,i);
+			}
 		}
 	}
 	
 	private void process(int vertex) {
 		Iterator<IntegerPair> neighbours = adjList.get(vertex).iterator();
+		
 		taken.set(vertex, true);
+		boolean isEndPoint = true;
 		while(neighbours.hasNext()) {
 			IntegerPair next = neighbours.next();
 			
 			//if node is not taken add it to queue, else add vertex to list of endpoints
 			if(!taken.get(next.second())) {
+				parentOf.set(next.second(), vertex);
 				queue.add(next);
+				isEndPoint = false;
 			}
+		}
+		
+		if(isEndPoint){
+			endpoints.add(vertex);
+			System.out.println("END IS "+ vertex); 
 		}
 	}
 	
-//	private int findAllMax(int currVertex, int prevVertex, int sourceVertex) {
-//		int weight = -1;
-//		Iterator<IntegerPair> weights = adjList.get(prevVertex).iterator();
-//		while(weights.hasNext()) {
-//			IntegerPair next = weights.next();
-//			if(next.second() == currVertex) {
-//				weight = next.first();
-//				break;
-//			}
-//		}
-//				
-//		//reach the source, return its weight as the currMax
-//		//assumes this vertex to be within [0,10)
-//		if(parentOf.get(currVertex) == -1 || currVertex == sourceVertex) {
-//			maximin[sourceVertex][currVertex] = weight;
-//			return weight;	
-//		} else {
-//			int currMaxWeight = Math.max(weight , findAllMax(parentOf.get(currVertex), currVertex, sourceVertex)); //traverse to parent first
-//			maximin[sourceVertex][currVertex] = currMaxWeight;
-//			return currMaxWeight;
-//		}
-//	}
+	private int findAllMax(int currVertex, int prevVertex, int sourceVertex) {
+		int weight = -1;
+		Iterator<IntegerPair> weights = adjList.get(prevVertex).iterator();
+		while(weights.hasNext()) {
+			IntegerPair next = weights.next();
+			if(next.second() == currVertex) {
+				weight = next.first();
+				break;
+			}
+		}
+				
+		//reach the source, return its weight as the currMax
+		//assumes this vertex to be within [0,10)
+		if(parentOf.get(currVertex) == -1 || currVertex == sourceVertex) {
+			maximin[sourceVertex][currVertex] = weight;
+			return weight;	
+		} else {
+			int currMaxWeight = Math.max(weight , findAllMax(parentOf.get(currVertex), currVertex, sourceVertex)); //traverse to parent first
+			maximin[sourceVertex][currVertex] = currMaxWeight;
+			return currMaxWeight;
+		}
+	}
 	
 	public int getMAXiMINMatrix(int source, int destination) {return this.maximin[source][destination];}
 }
