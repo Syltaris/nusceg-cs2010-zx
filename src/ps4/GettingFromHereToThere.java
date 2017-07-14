@@ -66,7 +66,6 @@ class MST {
 	private ArrayList<Boolean> taken;
 	private ArrayList<Integer> parentOf;
 	ArrayList <ArrayList<IntegerPair>> adjList;
-	private ArrayList<Integer> endpoints;
 	private int[][] maximin;
 	
 	
@@ -81,7 +80,6 @@ class MST {
 	private void preprocess() {
 		
 		for(int i = 0; i<Math.min(10, adjList.size()); i++) { //source
-			this.endpoints = new ArrayList<Integer>();
 			this.taken = new ArrayList<Boolean>(adjList.size());
 			this.parentOf = new ArrayList<Integer>(adjList.size());
 			for(int ii = 0; ii < adjList.size(); ii++) {
@@ -95,6 +93,9 @@ class MST {
 				
 				if(!taken.get(node.third())) {
 					parentOf.set(node.third(), node.second());
+					
+					maximin[i][node.third()] = Math.max(node.first(), maximin[i][node.second()]); // (edge's weight, currMax of prev node)
+					
 					process(node.third());
 				}
 			}
@@ -106,14 +107,6 @@ class MST {
 				System.out.println("PARENT OF "+ iiii++ +" IS " + parentList.next());
 			}
 			////////////////////////////
-			
-			//assumes MST is already created, returns array based on MST and parent array
-			Iterator<Integer> ends = endpoints.iterator();
-			while(ends.hasNext()) {
-				int endVertex = ends.next();
-				findAllMax(endVertex,endVertex,i);
-			}
-			
 			System.out.println("next" + i);
 		}
 	}
@@ -131,11 +124,6 @@ class MST {
 				queue.add(new IntegerTriple(next.first(), vertex, next.second())); // weight, vertex, edge
 				isEndPoint = false;
 			}
-		}
-		
-		if(isEndPoint){
-			endpoints.add(vertex);
-			System.out.println("END IS "+ vertex); 
 		}
 	}
 	
