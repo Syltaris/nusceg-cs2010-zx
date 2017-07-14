@@ -1,3 +1,4 @@
+package ps4;
 
 import java.util.*;
 import java.io.*;
@@ -63,53 +64,77 @@ class GettingFromHereToThere {
 class MST {
 	private PriorityQueue<IntegerTriple> queue; //(weight, vertex, edgeTo)
 	private ArrayList<Boolean> taken;
-	private ArrayList<Integer> parentOf;
 	ArrayList <ArrayList<IntegerPair>> adjList;
+	ArrayList <ArrayList<IntegerPair>> mstList;
+	private boolean[] visited;
 	private int[][] maximin;
 	
 	
 	public MST(ArrayList <ArrayList<IntegerPair>> adjList) {
 		this.adjList = adjList;
+		this.mstList = new ArrayList<ArrayList<IntegerPair>>();
 		this.queue = new PriorityQueue<IntegerTriple>();
+		this.taken = new ArrayList<Boolean>();
+		this.visited = new boolean[adjList.size()];
 		this.maximin = new int[Math.min(adjList.size(), 10)][adjList.size()];
+		while(taken.size() != adjList.size()) {
+			taken.add(false);
+			mstList.add(new ArrayList<IntegerPair>());
+		}
 
 		preprocess();
 	}
 	
-	private void preprocess() {
-		
-		for(int i = 0; i<Math.min(10, adjList.size()); i++) { //source
-			this.taken = new ArrayList<Boolean>(adjList.size());
-			this.parentOf = new ArrayList<Integer>(adjList.size());
-			for(int ii = 0; ii < adjList.size(); ii++) {
-				taken.add(false);
-				parentOf.add(-1);
+	private void preprocess() {	
+			process(0); //start off the queue
+
+			while(!queue.isEmpty()) {
+				IntegerTriple edge = queue.poll();
+				
+				if(!taken.get(edge.third())) {
+					mstList.get(edge.second()).add(new IntegerPair(edge.first(), edge.third()));
+					mstList.get(edge.third()).add(new IntegerPair(edge.first(), edge.second()));
+
+					maximin[0][edge.third()] = Math.max(edge.first(), maximin[0][edge.second()]); // (edge's weight, currMax of prev node)
+					process(edge.third());
+				} 
 			}
 			
-			process(i); //start off the queue
-			while(!queue.isEmpty()) {
-				IntegerTriple node = queue.poll();
+			
+			for(int i=1; i<Math.min(10, adjList.size()); i++) {
+				visited[i] = true;
+				DFS(i,i,i,0);
 				
-				if(!taken.get(node.third())) {
-					parentOf.set(node.third(), node.second());
-					
-					maximin[i][node.third()] = Math.max(node.first(), maximin[i][node.second()]); // (edge's weight, currMax of prev node)
-					process(node.third());
+				for(int j=0; j<visited.length; j++) {
+					visited[j] = false;
 				}
 			}
-		}
 	}
 	
 	private void process(int vertex) {
 		Iterator<IntegerPair> neighbours = adjList.get(vertex).iterator();
-		
+
 		taken.set(vertex, true);
 		while(neighbours.hasNext()) {
 			IntegerPair next = neighbours.next();
-			
+
 			//if node is not taken add it to queue, else add vertex to list of endpoints
 			if(!taken.get(next.second())) {
 				queue.add(new IntegerTriple(next.first(), vertex, next.second())); // weight, vertex, edge
+			}
+		}
+	}
+	
+	private void DFS(int vertexIndex, int prevIndex, int sourceVertex, int edgeWeight) {
+		Iterator<IntegerPair> neighbours = mstList.get(vertexIndex).iterator();
+		maximin[sourceVertex][vertexIndex] = Math.max(edgeWeight, maximin[sourceVertex][prevIndex]); // (edge's weight, currMax of prev node)
+
+		while(neighbours.hasNext()) {
+			IntegerPair nextNode = neighbours.next();
+
+			if(!visited[nextNode.second()]) {
+				visited[nextNode.second()] = true;
+				DFS(nextNode.second(), vertexIndex, sourceVertex, nextNode.first());
 			}
 		}
 	}
