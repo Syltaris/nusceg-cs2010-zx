@@ -11,51 +11,16 @@ import java.io.*;
 class GettingFromHereToThere {
   private int V; // number of vertices in the graph (number of rooms in the building)
   private ArrayList < ArrayList < IntegerPair > > AdjList; // the weighted graph (the building), effort rating of each corridor is stored here too
-
-  // if needed, declare a private data structure here that
-  // is accessible to all methods in this class
-  // --------------------------------------------
   
+  private MST mst;
+  
+  public GettingFromHereToThere() { }
 
-
-  // --------------------------------------------
-
-  public GettingFromHereToThere() {
-    // Write necessary codes during construction;
-    //
-    // write your answer here
-	  
-
-
-  }
-
-  void PreProcess() {
-    // write your answer here
-    // you can leave this method blank if you do not need it
-
-
-  }
+  void PreProcess() { this.mst = new MST(this.AdjList);}
 
   int Query(int source, int destination) {
-    int ans = 0;
-
-    // You have to report the weight of a corridor (an edge)
-    // which has the highest effort rating in the easiest path from source to destination for the wheelchair bound
-    //
-    // write your answer here
-    // get MST first, then store parents as well, to find max we traverse up the path and get the max val
-
-
-
-    return ans;
+    return mst.getMAXiMINMatrix(source, destination);
   }
-
-  // You can add extra function if needed
-  // --------------------------------------------
-
-
-
-  // --------------------------------------------
 
   void run() throws Exception {
     // do not alter this method
@@ -74,12 +39,12 @@ class GettingFromHereToThere {
         int k = sc.nextInt();
         while (k-- > 0) {
           int j = sc.nextInt(), w = sc.nextInt();
-          AdjList.get(i).add(new IntegerPair(j, w)); // edge (corridor) weight (effort rating) is stored here
+          AdjList.get(i).add(new IntegerPair(w, j)); //  weight (effort rating) edge (corridor) is stored here
         }
       }
-
+      
       PreProcess(); // you may want to use this function or leave it empty if you do not need it
-
+            
       int Q = sc.nextInt();
       while (Q-- > 0)
         pr.println(Query(sc.nextInt(), sc.nextInt()));
@@ -97,11 +62,80 @@ class GettingFromHereToThere {
 }
 
 class MST {
-	private PriorityQueue<IntegerPair> queue ;
+	private PriorityQueue<IntegerPair> queue; //(weight, vertex)
+	private ArrayList<Boolean> taken;
+	ArrayList <ArrayList<IntegerPair>> adjList;
+	private int[][] maximin;
 	
-	public MST(ArrayList <ArrayList<IntegerPair>> AdjList) {
+	
+	public MST(ArrayList <ArrayList<IntegerPair>> adjList) {
+		this.adjList = adjList;
+		this.queue = new PriorityQueue<IntegerPair>();
+		this.taken = new ArrayList<Boolean>(adjList.size());
+		this.maximin = new int[Math.min(adjList.size(), 10)][adjList.size()];
+
+		for(int i = 0; i < adjList.size(); i++) {
+			taken.add(false);
+		}
 		
+		preprocess();
 	}
+	
+	private void preprocess() {
+		process(0); //start off the queue
+		
+		while(!queue.isEmpty()) {
+			IntegerPair node = queue.poll();
+			System.out.println("NOW TRAVERSING " + node.second());
+
+			if(!taken.get(node.second())) {
+				process(node.second());
+			}
+		}
+		
+		//assumes MST is already created, returns array based on MST and parent array
+		for(int i=0; i<Math.min(10, adjList.size()); i++) {//source
+			
+		}
+	}
+	
+	private void process(int vertex) {
+		Iterator<IntegerPair> neighbours = adjList.get(vertex).iterator();
+		taken.set(vertex, true);
+		while(neighbours.hasNext()) {
+			IntegerPair next = neighbours.next();
+			
+			//if node is not taken add it to queue, else add vertex to list of endpoints
+			if(!taken.get(next.second())) {
+				queue.add(next);
+			}
+		}
+	}
+	
+//	private int findAllMax(int currVertex, int prevVertex, int sourceVertex) {
+//		int weight = -1;
+//		Iterator<IntegerPair> weights = adjList.get(prevVertex).iterator();
+//		while(weights.hasNext()) {
+//			IntegerPair next = weights.next();
+//			if(next.second() == currVertex) {
+//				weight = next.first();
+//				break;
+//			}
+//		}
+//				
+//		//reach the source, return its weight as the currMax
+//		//assumes this vertex to be within [0,10)
+//		if(parentOf.get(currVertex) == -1 || currVertex == sourceVertex) {
+//			maximin[sourceVertex][currVertex] = weight;
+//			return weight;	
+//		} else {
+//			int currMaxWeight = Math.max(weight , findAllMax(parentOf.get(currVertex), currVertex, sourceVertex)); //traverse to parent first
+//			maximin[sourceVertex][currVertex] = currMaxWeight;
+//			return currMaxWeight;
+//		}
+//	}
+	
+	public int getMAXiMINMatrix(int source, int destination) {return this.maximin[source][destination];}
 }
 
 class IntegerScanner { // coded by Ian Leow, using any other I/O method is not recommended
