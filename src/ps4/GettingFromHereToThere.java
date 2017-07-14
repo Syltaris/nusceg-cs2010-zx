@@ -1,4 +1,3 @@
-package ps4;
 
 import java.util.*;
 import java.io.*;
@@ -95,19 +94,9 @@ class MST {
 					parentOf.set(node.third(), node.second());
 					
 					maximin[i][node.third()] = Math.max(node.first(), maximin[i][node.second()]); // (edge's weight, currMax of prev node)
-					
 					process(node.third());
 				}
 			}
-			
-			///////////////////
-			Iterator<Integer> parentList = parentOf.iterator();
-			int iiii =0 ;
-			while(parentList.hasNext()) {
-				System.out.println("PARENT OF "+ iiii++ +" IS " + parentList.next());
-			}
-			////////////////////////////
-			System.out.println("next" + i);
 		}
 	}
 	
@@ -115,38 +104,13 @@ class MST {
 		Iterator<IntegerPair> neighbours = adjList.get(vertex).iterator();
 		
 		taken.set(vertex, true);
-		boolean isEndPoint = true;
 		while(neighbours.hasNext()) {
 			IntegerPair next = neighbours.next();
 			
 			//if node is not taken add it to queue, else add vertex to list of endpoints
 			if(!taken.get(next.second())) {
 				queue.add(new IntegerTriple(next.first(), vertex, next.second())); // weight, vertex, edge
-				isEndPoint = false;
 			}
-		}
-	}
-	
-	private int findAllMax(int currVertex, int prevVertex, int sourceVertex) {
-		int weight = -1;
-		Iterator<IntegerPair> weights = adjList.get(prevVertex).iterator();
-		while(weights.hasNext()) {
-			IntegerPair next = weights.next();
-			if(next.second() == currVertex) {
-				weight = next.first();
-				break;
-			}
-		}
-				
-		//reach the source, return its weight as the currMax
-		//assumes this vertex to be within [0,10)
-		if(parentOf.get(currVertex) == -1 || currVertex == sourceVertex) {
-			maximin[sourceVertex][currVertex] = weight;
-			return weight;	
-		} else {
-			int currMaxWeight = Math.max(weight , findAllMax(parentOf.get(currVertex), currVertex, sourceVertex)); //traverse to parent first
-			maximin[sourceVertex][currVertex] = currMaxWeight;
-			return currMaxWeight;
 		}
 	}
 	
