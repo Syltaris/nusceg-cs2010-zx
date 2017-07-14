@@ -62,7 +62,7 @@ class GettingFromHereToThere {
 }
 
 class MST {
-	private PriorityQueue<IntegerPair> queue; //(weight, vertex)
+	private PriorityQueue<IntegerTriple> queue; //(weight, vertex, edgeTo)
 	private ArrayList<Boolean> taken;
 	private ArrayList<Integer> parentOf;
 	ArrayList <ArrayList<IntegerPair>> adjList;
@@ -72,45 +72,49 @@ class MST {
 	
 	public MST(ArrayList <ArrayList<IntegerPair>> adjList) {
 		this.adjList = adjList;
-		this.queue = new PriorityQueue<IntegerPair>();
-		this.taken = new ArrayList<Boolean>(adjList.size());
-		this.parentOf = new ArrayList<Integer>(adjList.size());
-		this.endpoints = new ArrayList<Integer>();
+		this.queue = new PriorityQueue<IntegerTriple>();
 		this.maximin = new int[Math.min(adjList.size(), 10)][adjList.size()];
 
-		for(int i = 0; i < adjList.size(); i++) {
-			taken.add(false);
-			parentOf.add(-1);
-		}
-		
 		preprocess();
 	}
 	
 	private void preprocess() {
-		process(0); //start off the queue
 		
-		while(!queue.isEmpty()) {
-			IntegerPair node = queue.poll();
-			
-			if(!taken.get(node.second())) {
-				process(node.second());
+		for(int i = 0; i<Math.min(10, adjList.size()); i++) { //source
+			this.endpoints = new ArrayList<Integer>();
+			this.taken = new ArrayList<Boolean>(adjList.size());
+			this.parentOf = new ArrayList<Integer>(adjList.size());
+			for(int ii = 0; ii < adjList.size(); ii++) {
+				taken.add(false);
+				parentOf.add(-1);
 			}
-		}
-		
-		Iterator parentList = parentOf.iterator();
-		int iiii =0 ;
-		while(parentList.hasNext()) {
-			System.out.println("PARENT OF "+ iiii++ +" IS " + parentList.next());
-		}
-		
-		//assumes MST is already created, returns array based on MST and parent array
-		for(int i=0; i<Math.min(10, adjList.size()); i++) {//source
+			
+			process(i); //start off the queue
+			while(!queue.isEmpty()) {
+				IntegerTriple node = queue.poll();
+				
+				if(!taken.get(node.third())) {
+					parentOf.set(node.third(), node.second());
+					process(node.third());
+				}
+			}
+			
+			///////////////////
+			Iterator<Integer> parentList = parentOf.iterator();
+			int iiii =0 ;
+			while(parentList.hasNext()) {
+				System.out.println("PARENT OF "+ iiii++ +" IS " + parentList.next());
+			}
+			////////////////////////////
+			
+			//assumes MST is already created, returns array based on MST and parent array
 			Iterator<Integer> ends = endpoints.iterator();
-							
 			while(ends.hasNext()) {
 				int endVertex = ends.next();
 				findAllMax(endVertex,endVertex,i);
 			}
+			
+			System.out.println("next" + i);
 		}
 	}
 	
@@ -124,8 +128,7 @@ class MST {
 			
 			//if node is not taken add it to queue, else add vertex to list of endpoints
 			if(!taken.get(next.second())) {
-				parentOf.set(next.second(), vertex);
-				queue.add(next);
+				queue.add(new IntegerTriple(next.first(), vertex, next.second())); // weight, vertex, edge
 				isEndPoint = false;
 			}
 		}
