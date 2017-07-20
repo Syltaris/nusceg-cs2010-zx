@@ -5,7 +5,7 @@ import java.io.*;
 
 // write your matric number here: A0138915X
 // write your name here: Chong Ze Xuan
-// write list of collaborators here: 
+// write list of collaborators here: Clarence Chee, Tan Hong Yu, Zachary Ong
 // year 2017 hash code: x8DYWsALaAzykZ8dYPZP (do NOT delete this line)
 
 class Bleeding {
@@ -18,61 +18,94 @@ class Bleeding {
   // is accessible to all methods in this class
   // --------------------------------------------
   ArrayList<Integer> dist;
-  TreeSet<IntegerPair> pq;
-  private ArrayList < ArrayList < Integer > > Answers; // //V*V matrix of answers, stores all the valid SPs, INF if unreachable
+  PriorityQueue<IntegerTriple> pq;
+  private ArrayList< ArrayList < ArrayList < Integer > > > Answers; //V*K*V matrix of answers, stores all the valid SPs, INF if unreachable
   // --------------------------------------------
 
   public Bleeding() {}
 
   void PreProcess() {	  
-	  Answers = new ArrayList<ArrayList<Integer>>(V);
-
-	  for(int i=0; i<Math.min(AdjList.size(), 10); i++) {
-		  dist = new ArrayList<Integer>(V);
-		  pq = new TreeSet<IntegerPair>();
-		  
-		  //constructing dist of INF values representing vertices, answers matrix
-	      for(int j = 0; j<V; j++) {
-	          dist.add(INF);
-	      }
-	      dist.set(i, 0);
-		  
-		  dijkstra(i, 20); //go through all the sources
+	  Answers = new ArrayList<ArrayList<ArrayList<Integer>>>(V);
+	  for(int i=0; i<V; i++) {
+		  Answers.add(new ArrayList<ArrayList<Integer>>());
+	  
+		  for(int j=0; j<20; j++)
+			  Answers.get(i).add(new ArrayList<Integer>());
 	  }
   }
 
   int Query(int s, int t, int k) {
-    int ans = -1;
-    if(Answers.get(s).get(t) != INF) {
-    	ans = Answers.get(s).get(t);
+    int ans = INF;
+    
+    //randomly check any k, if empty, generate the dijkstra sssp on it
+    //else, answer should already be generated
+    if(Answers.get(s).get(0).isEmpty()) {
+    	dijkstra(s, k);
     }
-    return ans;
+    
+    //search for the answer
+    for(int i=1; i<=k; i++) {
+    	ArrayList<Integer> next = Answers.get(s).get(i);
+    	//if pass the k boundary for the graph, or k restriction by query
+    	if(next.isEmpty()) {
+    		break;
+    	}
+    	
+//    																																System.out.println(i + ": " + next);
+    	
+    	ans = Math.min(next.get(t), ans);
+    }
+    
+    return ans == INF ? -1 : ans;
   }
 
-  public void dijkstra(int source, int limit) {
+  private void dijkstraPrep(int source) {
+	  dist = new ArrayList<Integer>(V);
+	  pq = new PriorityQueue<IntegerTriple>();
+	  
+	  //constructing dist of INF values representing vertices, answers matrix
+    for(int j = 0; j<V; j++) {
+        dist.add(INF);
+    }
+    dist.set(source, 0);
+}
 
+  @SuppressWarnings("unchecked")
+public void dijkstra(int source, int limit) {
+	  dijkstraPrep(source); //inits the dist[] and pq
+	  
+	  int currK = 1;
+	  
 	  //djikstra optimized, lazy DS
-      pq.add(new IntegerPair(dist.get(source), source));
+      pq.add(new IntegerTriple(1, dist.get(source), source)); //k, D[u], u
       while(!pq.isEmpty()) {
-          IntegerPair next = pq.first(); //dequeue min item
-          pq.remove(next); //finish the dequeue
-          if(next.first() == dist.get(next.second())) {//if d == D[u]
-               Iterator<IntegerPair> neighbours = AdjList.get(next.second()).iterator();
+          IntegerTriple next = pq.poll(); //dequeue min item
+          
+          //at this point, should have processed all 'k' distances, add to Kth array for the answers, (check for 20th k limit too)
+          if(currK < next.first()) {
+        	  Answers.get(source).set(currK, (ArrayList<Integer>)dist.clone());
+//        	  																													System.out.println(currK + ":: " + dist);
+        	  currK = next.first();
+          }
+          if (next.first() >= 21) {
+        	  break;
+          }
+          
+          int k = next.first() + 1;     	  //now processing next 'hospitals' with higher k than this current node
+
+          if(next.second() == dist.get(next.third())) {//if d == D[u]
+               Iterator<IntegerPair> neighbours = AdjList.get(next.third()).iterator();
                while(neighbours.hasNext()) {
                    IntegerPair ee = neighbours.next();
-                   if(dist.get(ee.second()) > dist.get(next.second()) + ee.first()) {//if can relax, relax, then add back to PQ
-                       dist.set(ee.second(), dist.get(next.second()) + ee.first()); //if D[v] > D[u] + w(u,v)...                      
-                       pq.add(new IntegerPair(dist.get(ee.second()), ee.second()));
+                   if(dist.get(ee.second()) > dist.get(next.third()) + ee.first()) {//if can relax, relax, then add back to PQ
+                       dist.set(ee.second(), dist.get(next.third()) + ee.first()); //if D[v] > D[u] + w(u,v)...                      
+                       pq.add(new IntegerTriple(k, dist.get(ee.second()), ee.second()));
                    }
                }
           }
       }
-      
-      //after done, add the dist array to the Answers
-      Answers.add(dist);
   }
 
-  // --------------------------------------------
 
   void run() throws Exception {
     // you can alter this method if you need to do so
@@ -154,7 +187,28 @@ class IntegerScanner { // coded by Ian Leow, using any other I/O method is not r
   }
 }
 
+class IntegerTriple implements Comparable < IntegerTriple > {
+	  Integer _first, _second, _third;
 
+	  public IntegerTriple(Integer f, Integer s, Integer t) {
+	    _first = f;
+	    _second = s;
+	    _third = t;
+	  }
+
+	  public int compareTo(IntegerTriple o) {
+	    if (!this.first().equals(o.first()))
+	      return this.first() - o.first();
+	    else if(!this.second().equals(o.second()))
+	      return this.second() - o.second();
+	    else
+		  return this.third() - o.third();
+	  }
+
+	  Integer first() { return _first; }
+	  Integer second() { return _second; }
+	  Integer third() {return _third; }
+	}
 
 class IntegerPair implements Comparable < IntegerPair > {
   Integer _first, _second;
