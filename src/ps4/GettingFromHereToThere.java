@@ -11,51 +11,16 @@ import java.io.*;
 class GettingFromHereToThere {
   private int V; // number of vertices in the graph (number of rooms in the building)
   private ArrayList < ArrayList < IntegerPair > > AdjList; // the weighted graph (the building), effort rating of each corridor is stored here too
-
-  // if needed, declare a private data structure here that
-  // is accessible to all methods in this class
-  // --------------------------------------------
   
+  private MST mst;
+  
+  public GettingFromHereToThere() { }
 
-
-  // --------------------------------------------
-
-  public GettingFromHereToThere() {
-    // Write necessary codes during construction;
-    //
-    // write your answer here
-	  
-
-
-  }
-
-  void PreProcess() {
-    // write your answer here
-    // you can leave this method blank if you do not need it
-
-
-  }
+  void PreProcess() { this.mst = new MST(this.AdjList);}
 
   int Query(int source, int destination) {
-    int ans = 0;
-
-    // You have to report the weight of a corridor (an edge)
-    // which has the highest effort rating in the easiest path from source to destination for the wheelchair bound
-    //
-    // write your answer here
-    // get MST first, then store parents as well, to find max we traverse up the path and get the max val
-
-
-
-    return ans;
+    return mst.getMAXiMINMatrix(source, destination);
   }
-
-  // You can add extra function if needed
-  // --------------------------------------------
-
-
-
-  // --------------------------------------------
 
   void run() throws Exception {
     // do not alter this method
@@ -74,12 +39,12 @@ class GettingFromHereToThere {
         int k = sc.nextInt();
         while (k-- > 0) {
           int j = sc.nextInt(), w = sc.nextInt();
-          AdjList.get(i).add(new IntegerPair(j, w)); // edge (corridor) weight (effort rating) is stored here
+          AdjList.get(i).add(new IntegerPair(w, j)); //  weight (effort rating) edge (corridor) is stored here
         }
       }
-
+      
       PreProcess(); // you may want to use this function or leave it empty if you do not need it
-
+            
       int Q = sc.nextInt();
       while (Q-- > 0)
         pr.println(Query(sc.nextInt(), sc.nextInt()));
@@ -97,11 +62,84 @@ class GettingFromHereToThere {
 }
 
 class MST {
-	private PriorityQueue<IntegerPair> queue ;
+	private PriorityQueue<IntegerTriple> queue; //(weight, vertex, edgeTo)
+	private ArrayList<Boolean> taken;
+	ArrayList <ArrayList<IntegerPair>> adjList;
+	ArrayList <ArrayList<IntegerPair>> mstList;
+	private boolean[] visited;
+	private int[][] maximin;
 	
-	public MST(ArrayList <ArrayList<IntegerPair>> AdjList) {
-		
+	
+	public MST(ArrayList <ArrayList<IntegerPair>> adjList) {
+		this.adjList = adjList;
+		this.mstList = new ArrayList<ArrayList<IntegerPair>>();
+		this.queue = new PriorityQueue<IntegerTriple>();
+		this.taken = new ArrayList<Boolean>();
+		this.visited = new boolean[adjList.size()];
+		this.maximin = new int[Math.min(adjList.size(), 10)][adjList.size()];
+		while(taken.size() != adjList.size()) {
+			taken.add(false);
+			mstList.add(new ArrayList<IntegerPair>());
+		}
+
+		preprocess();
 	}
+	
+	private void preprocess() {	
+			process(0); //start off the queue
+
+			while(!queue.isEmpty()) {
+				IntegerTriple edge = queue.poll();
+				
+				if(!taken.get(edge.third())) {
+					mstList.get(edge.second()).add(new IntegerPair(edge.first(), edge.third()));
+					mstList.get(edge.third()).add(new IntegerPair(edge.first(), edge.second()));
+
+					maximin[0][edge.third()] = Math.max(edge.first(), maximin[0][edge.second()]); // (edge's weight, currMax of prev node)
+					process(edge.third());
+				} 
+			}
+			
+			
+			for(int i=1; i<Math.min(10, adjList.size()); i++) {
+				visited[i] = true;
+				DFS(i,i,i,0);
+				
+				for(int j=0; j<visited.length; j++) {
+					visited[j] = false;
+				}
+			}
+	}
+	
+	private void process(int vertex) {
+		Iterator<IntegerPair> neighbours = adjList.get(vertex).iterator();
+
+		taken.set(vertex, true);
+		while(neighbours.hasNext()) {
+			IntegerPair next = neighbours.next();
+
+			//if node is not taken add it to queue, else add vertex to list of endpoints
+			if(!taken.get(next.second())) {
+				queue.add(new IntegerTriple(next.first(), vertex, next.second())); // weight, vertex, edge
+			}
+		}
+	}
+	
+	private void DFS(int vertexIndex, int prevIndex, int sourceVertex, int edgeWeight) {
+		Iterator<IntegerPair> neighbours = mstList.get(vertexIndex).iterator();
+		maximin[sourceVertex][vertexIndex] = Math.max(edgeWeight, maximin[sourceVertex][prevIndex]); // (edge's weight, currMax of prev node)
+
+		while(neighbours.hasNext()) {
+			IntegerPair nextNode = neighbours.next();
+
+			if(!visited[nextNode.second()]) {
+				visited[nextNode.second()] = true;
+				DFS(nextNode.second(), vertexIndex, sourceVertex, nextNode.first());
+			}
+		}
+	}
+	
+	public int getMAXiMINMatrix(int source, int destination) {return this.maximin[source][destination];}
 }
 
 class IntegerScanner { // coded by Ian Leow, using any other I/O method is not recommended
