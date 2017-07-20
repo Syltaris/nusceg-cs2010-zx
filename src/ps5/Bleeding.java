@@ -14,21 +14,16 @@ class Bleeding {
   private ArrayList < ArrayList < IntegerPair > > AdjList; // the weighted graph (the Singapore map), the length of each edge (road) is stored here too, as the weight of edge
   
   public static final int INF = Integer.MAX_VALUE/2;
-  // if needed, declare a private data structure here that
-  // is accessible to all methods in this class
-  // --------------------------------------------
   ArrayList<Integer> dist;
   PriorityQueue<IntegerTriple> pq;
   private ArrayList< ArrayList < ArrayList < Integer > > > Answers; //V*K*V matrix of answers, stores all the valid SPs, INF if unreachable
-  // --------------------------------------------
-
+  
   public Bleeding() {}
 
   void PreProcess() {	  
 	  Answers = new ArrayList<ArrayList<ArrayList<Integer>>>(V);
 	  for(int i=0; i<V; i++) {
 		  Answers.add(new ArrayList<ArrayList<Integer>>());
-	  
 		  for(int j=0; j<20; j++)
 			  Answers.get(i).add(new ArrayList<Integer>());
 	  }
@@ -40,19 +35,17 @@ class Bleeding {
     //randomly check any k, if empty, generate the dijkstra sssp on it
     //else, answer should already be generated
     if(Answers.get(s).get(0).isEmpty()) {
-    	dijkstra(s, k);
+    	dijkstra(s);
     }
     
-    //search for the answer
-    for(int i=1; i<=k; i++) {
+    //search for the answer, skip searching for k=1 since will be -1
+    for(int i=2; i<=k; i++) {
     	ArrayList<Integer> next = Answers.get(s).get(i);
     	//if pass the k boundary for the graph, or k restriction by query
     	if(next.isEmpty()) {
     		break;
     	}
-    	
 //    																																System.out.println(i + ": " + next);
-    	
     	ans = Math.min(next.get(t), ans);
     }
     
@@ -71,13 +64,13 @@ class Bleeding {
 }
 
   @SuppressWarnings("unchecked")
-public void dijkstra(int source, int limit) {
+public void dijkstra(int source) {
 	  dijkstraPrep(source); //inits the dist[] and pq
 	  
-	  int currK = 1;
+	  int currK = 2;
 	  
 	  //djikstra optimized, lazy DS
-      pq.add(new IntegerTriple(1, dist.get(source), source)); //k, D[u], u
+      pq.add(new IntegerTriple(currK, dist.get(source), source)); //k, D[u], u
       while(!pq.isEmpty()) {
           IntegerTriple next = pq.poll(); //dequeue min item
           
