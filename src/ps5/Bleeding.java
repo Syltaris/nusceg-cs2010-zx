@@ -27,8 +27,7 @@ class Bleeding {
   void PreProcess() {	  
 	  Answers = new ArrayList<ArrayList<Integer>>(V);
 
-	  
-	  for(int i=0; i<AdjList.size(); i++) {
+	  for(int i=0; i<Math.min(AdjList.size(), 10); i++) {
 		  dist = new ArrayList<Integer>(V);
 		  pq = new TreeSet<IntegerPair>();
 		  
@@ -40,7 +39,6 @@ class Bleeding {
 		  
 		  dijkstra(i, 20); //go through all the sources
 	  }
-    //------------------------------------------------------------------------- 
   }
 
   int Query(int s, int t, int k) {
@@ -50,9 +48,6 @@ class Bleeding {
     }
     return ans;
   }
-
-  // You can add extra function if needed
-  // --------------------------------------------
 
   public void dijkstra(int source, int limit) {
 
