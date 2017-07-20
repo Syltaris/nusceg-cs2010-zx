@@ -22,68 +22,51 @@ class Bleeding {
   private ArrayList < ArrayList < Integer > > Answers; // //V*V matrix of answers, stores all the valid SPs, INF if unreachable
   // --------------------------------------------
 
-  public Bleeding() {
-    // Write necessary code during construction
-    //
-    // write your answer here
-	  dist = new ArrayList<Integer>(V);
-	  pq = new TreeSet<IntegerPair>();
-	  Answers = new ArrayList<ArrayList<Integer>>(V);
-  }
+  public Bleeding() {}
 
-  void PreProcess() {
-    // Write necessary code to preprocess the graph, if needed
-    //
-    // write your answer here
-    //------------------------------------------------------------------------- 
-	  //constructing dist of INF values representing vertices, answers matrix
-      for(int i = 0; i<V; i++) {
-          dist.add(INF);
-      }
-      dist.set(0, 0);
-	  
+  void PreProcess() {	  
+	  Answers = new ArrayList<ArrayList<Integer>>(V);
+
 	  
 	  for(int i=0; i<AdjList.size(); i++) {
+		  dist = new ArrayList<Integer>(V);
+		  pq = new TreeSet<IntegerPair>();
 		  
-		  dijkstra(i); //go through all the sources
+		  //constructing dist of INF values representing vertices, answers matrix
+	      for(int j = 0; j<V; j++) {
+	          dist.add(INF);
+	      }
+	      dist.set(i, 0);
+		  
+		  dijkstra(i, 20); //go through all the sources
 	  }
     //------------------------------------------------------------------------- 
   }
 
   int Query(int s, int t, int k) {
     int ans = -1;
-
-    // You have to report the shortest path from Ket Fah's current position s
-    // to reach the chosen hospital t, output -1 if t is not reachable from s
-    // with one catch: this path cannot use more than k vertices      
-    //
-    // write your answer here
-
-
     if(Answers.get(s).get(t) != INF) {
     	ans = Answers.get(s).get(t);
     }
-    //------------------------------------------------------------------------- 
-    
     return ans;
   }
 
   // You can add extra function if needed
   // --------------------------------------------
 
-  public void dijkstra(int source) {
+  public void dijkstra(int source, int limit) {
+
 	  //djikstra optimized, lazy DS
-      pq.add(new IntegerPair(dist.get(source), 0));
+      pq.add(new IntegerPair(dist.get(source), source));
       while(!pq.isEmpty()) {
           IntegerPair next = pq.first(); //dequeue min item
           pq.remove(next); //finish the dequeue
           if(next.first() == dist.get(next.second())) {//if d == D[u]
                Iterator<IntegerPair> neighbours = AdjList.get(next.second()).iterator();
-              
                while(neighbours.hasNext()) {
                    IntegerPair ee = neighbours.next();
                    if(dist.get(ee.second()) > dist.get(next.second()) + ee.first()) {//if can relax, relax, then add back to PQ
-                       dist.set(ee.second(), dist.get(next.second()) + ee.first()); //if D[v] > D[u] + w(u,v)...
+                       dist.set(ee.second(), dist.get(next.second()) + ee.first()); //if D[v] > D[u] + w(u,v)...                      
                        pq.add(new IntegerPair(dist.get(ee.second()), ee.second()));
                    }
                }
