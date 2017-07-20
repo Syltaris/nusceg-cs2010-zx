@@ -12,22 +12,23 @@ class Bleeding {
   private int V; // number of vertices in the graph (number of junctions in Singapore map)
   private int Q; // number of queries
   private ArrayList < ArrayList < IntegerPair > > AdjList; // the weighted graph (the Singapore map), the length of each edge (road) is stored here too, as the weight of edge
-
+  
+  public static final int INF = Integer.MAX_VALUE/2;
   // if needed, declare a private data structure here that
   // is accessible to all methods in this class
   // --------------------------------------------
-
-
-
+  ArrayList<Integer> dist;
+  TreeSet<IntegerPair> pq;
+  private ArrayList < ArrayList < Integer > > Answers; // //V*V matrix of answers, stores all the valid SPs, INF if unreachable
   // --------------------------------------------
 
   public Bleeding() {
     // Write necessary code during construction
     //
     // write your answer here
-
-
-
+	  dist = new ArrayList<Integer>(V);
+	  pq = new TreeSet<IntegerPair>();
+	  Answers = new ArrayList<ArrayList<Integer>>(V);
   }
 
   void PreProcess() {
@@ -35,9 +36,17 @@ class Bleeding {
     //
     // write your answer here
     //------------------------------------------------------------------------- 
-
-
-
+	  //constructing dist of INF values representing vertices, answers matrix
+      for(int i = 0; i<V; i++) {
+          dist.add(INF);
+      }
+      dist.set(0, 0);
+	  
+	  
+	  for(int i=0; i<AdjList.size(); i++) {
+		  
+		  dijkstra(i); //go through all the sources
+	  }
     //------------------------------------------------------------------------- 
   }
 
@@ -51,16 +60,39 @@ class Bleeding {
     // write your answer here
 
 
-
+    if(Answers.get(s).get(t) != INF) {
+    	ans = Answers.get(s).get(t);
+    }
     //------------------------------------------------------------------------- 
-
+    
     return ans;
   }
 
   // You can add extra function if needed
   // --------------------------------------------
 
-
+  public void dijkstra(int source) {
+	  //djikstra optimized, lazy DS
+      pq.add(new IntegerPair(dist.get(source), 0));
+      while(!pq.isEmpty()) {
+          IntegerPair next = pq.first(); //dequeue min item
+          pq.remove(next); //finish the dequeue
+          if(next.first() == dist.get(next.second())) {//if d == D[u]
+               Iterator<IntegerPair> neighbours = AdjList.get(next.second()).iterator();
+              
+               while(neighbours.hasNext()) {
+                   IntegerPair ee = neighbours.next();
+                   if(dist.get(ee.second()) > dist.get(next.second()) + ee.first()) {//if can relax, relax, then add back to PQ
+                       dist.set(ee.second(), dist.get(next.second()) + ee.first()); //if D[v] > D[u] + w(u,v)...
+                       pq.add(new IntegerPair(dist.get(ee.second()), ee.second()));
+                   }
+               }
+          }
+      }
+      
+      //after done, add the dist array to the Answers
+      Answers.add(dist);
+  }
 
   // --------------------------------------------
 
@@ -81,7 +113,7 @@ class Bleeding {
         int k = sc.nextInt();
         while (k-- > 0) {
           int j = sc.nextInt(), w = sc.nextInt();
-          AdjList.get(i).add(new IntegerPair(j, w)); // edge (road) weight (in minutes) is stored here
+          AdjList.get(i).add(new IntegerPair(w, j)); // edge (road) weight (in minutes) is stored here
         }
       }
 
@@ -104,8 +136,6 @@ class Bleeding {
     ps5.run();
   }
 }
-
-
 
 class IntegerScanner { // coded by Ian Leow, using any other I/O method is not recommended
   BufferedInputStream bis;
