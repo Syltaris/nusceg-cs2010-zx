@@ -35,7 +35,8 @@ class Bleeding {
     //randomly check any k, if empty, generate the dijkstra sssp on it
     //else, answer should already be generated
     if(Answers.get(s).get(0).isEmpty()) {
-    	dijkstra(s);
+//    	dijkstra(s);
+    	bellmanford(s);
     }
     
     //search for the answer, skip searching for k=1 since will be -1
@@ -63,7 +64,49 @@ class Bleeding {
     dist.set(source, 0);
 }
 
+  
   @SuppressWarnings("unchecked")
+public void bellmanford(int source) {
+	  dist = new ArrayList<Integer>(V);
+	  //constructing dist of INF values representing vertices, answers matrix
+	    for(int j = 0; j<V; j++) {
+	        dist.add(INF);
+	    }
+	    
+	  ArrayList<IntegerTriple> edgeList = new ArrayList<IntegerTriple>(V);
+	  
+	  int j = 0;
+	  for(ArrayList<IntegerPair> neighbours : AdjList) {
+		  
+		  for(IntegerPair pair : neighbours)
+			  edgeList.add(new IntegerTriple(pair.first(), j, pair.second())); //w, u, v
+		  
+		  j++;
+	  }
+	  dist.set(source, 0); //this determines the source
+	  
+	  //run K iterations, at each iteration store dist into Answers
+	  for(int i = 2; i<Math.min(21, AdjList.size()); i++) {
+		  Iterator<IntegerTriple> edges = edgeList.iterator();
+		  
+			System.out.println(i + "before:: " + dist);
+
+		  
+		  while(edges.hasNext()) {
+			  IntegerTriple next = edges.next();
+			  
+			  if(dist.get(next.third()) > dist.get(next.second()) + next.first() ) {
+				  dist.set(next.third(), dist.get(next.second()) + next.first());
+			  }
+		  }
+		  
+			System.out.println(i + ":: " + dist);
+
+		  Answers.get(source).set(i, (ArrayList<Integer>)dist.clone());
+	  }
+	 
+  }
+  
 public void dijkstra(int source) {
 	  dijkstraPrep(source); //inits the dist[] and pq
 	  
@@ -76,7 +119,9 @@ public void dijkstra(int source) {
           
           //at this point, should have processed all 'k' distances, add to Kth array for the answers, (check for 20th k limit too)
           if(currK < next.first()) {
-        	  Answers.get(source).set(currK, (ArrayList<Integer>)dist.clone());
+        	  for(Integer e : dist)
+        		  Answers.get(source).get(currK).add(e);
+        	  
 //        	  																													System.out.println(currK + ":: " + dist);
         	  currK = next.first();
           }
