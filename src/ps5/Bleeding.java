@@ -36,14 +36,11 @@ class Bleeding {
     if(Answers.get(s).get(t).isEmpty()) {
     	dijkstra(s);
     }
-
     for(IntegerPair next : Answers.get(s).get(t)) {
     	if(next.first() > k)
     		continue;
     	ans = next.second();
-
     }
-    
     return ans == INF ? -1 : ans;
   }
 
@@ -61,21 +58,20 @@ class Bleeding {
     dist.set(source, 0);
 }
   
-	@SuppressWarnings("unchecked")
 	//normal dijkstra
 	public void dijkstra(int source) {
 		dijkstraPrep(source);
 
 		int currK = 2;
-		pq.add(new IntegerTriple(currK, 0, source)); // add source in with dist 0
+		pq.add(new IntegerTriple(0, currK, source)); // add source in with dist 0
 		while (!pq.isEmpty()) {
 			IntegerTriple next = pq.first();
 			pq.remove(next); // finish the dequeue
 
-			currK = next.first();
-			if (next.first() >= 21) {break;}
+			currK = next.second();
+			if (currK >= 21) {break;}
 
-			int k = next.first() + 1;
+			int k = currK + 1;
 			Iterator<IntegerPair> neighbours = AdjList.get(next.third()).iterator();
 
 			while (neighbours.hasNext()) {
@@ -87,7 +83,7 @@ class Bleeding {
 					Answers.get(source).get(ee.second()).add(new IntegerPair(currK, dist.get(ee.second()))); //k, cost
 					
 					pq.removeIf( e -> e.third() == ee.second() );
-					pq.add(new IntegerTriple(k, dist.get(ee.second()), ee.second()));
+					pq.add(new IntegerTriple( dist.get(ee.second()), k, ee.second()));
 				}
 			}
 		}
