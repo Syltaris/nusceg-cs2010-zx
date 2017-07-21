@@ -24,7 +24,7 @@ class Bleeding {
 	  Answers = new ArrayList<ArrayList<ArrayList<Integer>>>(V);
 	  for(int i=0; i<V; i++) {
 		  Answers.add(new ArrayList<ArrayList<Integer>>());
-		  for(int j=0; j<20; j++)
+		  for(int j=0; j<21; j++)
 			  Answers.get(i).add(new ArrayList<Integer>());
 	  }
   }
@@ -34,20 +34,9 @@ class Bleeding {
     
     //randomly check any k, if empty, generate the dijkstra sssp on it
     //else, answer should already be generated
-    if(Answers.get(s).get(0).isEmpty()) {
+    if(Answers.get(s).get(2).isEmpty()) {
     	dijkstra(s);
     }
-    
-//    //search for the answer, skip searching for k=1 since will be -1
-//    for(int i=2; i<=k; i++) {
-//    	ArrayList<Integer> next = Answers.get(s).get(i);
-//    	//if pass the k boundary for the graph, or k restriction by query
-//    	if(next.isEmpty()) {
-//    		break;
-//    	}
-////    																																System.out.println(i + ": " + next);
-//    	ans = Math.min(next.get(t), ans);
-//    }
     
     //search for the answer, skip searching for k=1 since will be -1
     for(int i=k; i>1; i--) {
@@ -60,7 +49,6 @@ class Bleeding {
         	ans = next.get(t);
         	break;
     	}
-    	
     }
     
     return ans == INF ? -1 : ans;
@@ -99,6 +87,7 @@ public void dijkstra(int source) {
           if (next.first() >= 21) {
         	  break;
           }
+          
           
           int k = next.first() + 1;     	  //now processing next 'hospitals' with higher k than this current node
 
