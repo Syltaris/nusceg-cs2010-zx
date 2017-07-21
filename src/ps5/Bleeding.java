@@ -15,7 +15,7 @@ class Bleeding {
   
   public static final int INF = Integer.MAX_VALUE - Integer.MAX_VALUE/8;
   ArrayList<Integer> dist;
-  TreeSet<IntegerTriple> pq;
+  PriorityQueue<IntegerTriple> pq;
   private ArrayList< ArrayList < ArrayList < IntegerPair > > > Answers; //V*V*K matrix of answers, stores all the valid SPs, INF if unreachable
   
   public Bleeding() {}
@@ -47,44 +47,41 @@ class Bleeding {
 
   private void dijkstraPrep(int source) {
 	  dist = new ArrayList<Integer>(V);
-	  pq = new TreeSet<IntegerTriple>();
+	  pq = new PriorityQueue<IntegerTriple>();
 	  //constructing dist of INF values representing vertices, answers matrix
 	  //init all other vertices except source into PQ
 	  for(int j = 0; j<V; j++) {
         dist.add(INF);
-        if(j == source)
-        	continue;
-        pq.add(new IntegerTriple(INF, INF, j));
-    }
-    dist.set(source, 0);
-}
+	  }
+	  dist.set(source, 0);
+  }
   
-	//normal dijkstra
+	//modified dijkstra
 	public void dijkstra(int source) {
 		dijkstraPrep(source);
 
 		int currK = 2;
 		pq.add(new IntegerTriple(0, currK, source)); // add source in with dist 0
 		while (!pq.isEmpty()) {
-			IntegerTriple next = pq.first();
-			pq.remove(next); // finish the dequeue
+			IntegerTriple next = pq.poll();
 
 			currK = next.second();
 			if (currK >= 21) {break;}
 
 			int k = currK + 1;
-			Iterator<IntegerPair> neighbours = AdjList.get(next.third()).iterator();
-
-			while (neighbours.hasNext()) {
-				IntegerPair ee = neighbours.next();
-				if (dist.get(ee.second()) > dist.get(next.third()) + ee.first()) {
-					dist.set(ee.second(), dist.get(next.third()) + ee.first());
-					
-					//if can relax, add it as possible answer to Answers
-					Answers.get(source).get(ee.second()).add(new IntegerPair(currK, dist.get(ee.second()))); //k, cost
-					
-					pq.removeIf( e -> e.third() == ee.second() );
-					pq.add(new IntegerTriple( dist.get(ee.second()), k, ee.second()));
+			
+			if(next.first() == dist.get(next.third())) {
+				Iterator<IntegerPair> neighbours = AdjList.get(next.third()).iterator();
+				while (neighbours.hasNext()) {
+					IntegerPair ee = neighbours.next();
+					if (dist.get(ee.second()) > dist.get(next.third()) + ee.first()) {
+						dist.set(ee.second(), dist.get(next.third()) + ee.first());
+						
+						//if can relax, add it as possible answer to Answers
+						Answers.get(source).get(ee.second()).add(new IntegerPair(currK, dist.get(ee.second()))); //k, cost
+						
+						pq.add(new IntegerTriple(dist.get(ee.second()), k, ee.second()));
+					}
 				}
 			}
 		}
