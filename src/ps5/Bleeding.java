@@ -16,39 +16,32 @@ class Bleeding {
   public static final int INF = Integer.MAX_VALUE - Integer.MAX_VALUE/8;
   ArrayList<Integer> dist;
   TreeSet<IntegerTriple> pq;
-  private ArrayList< ArrayList < ArrayList < Integer > > > Answers; //V*K*V matrix of answers, stores all the valid SPs, INF if unreachable
+  private ArrayList< ArrayList < ArrayList < IntegerPair > > > Answers; //V*V*K matrix of answers, stores all the valid SPs, INF if unreachable
   
   public Bleeding() {}
 
   void PreProcess() {	  
-	  Answers = new ArrayList<ArrayList<ArrayList<Integer>>>(V);
+	  Answers = new ArrayList<ArrayList<ArrayList<IntegerPair>>>(V);
 	  for(int i=0; i<V; i++) {
-		  Answers.add(new ArrayList<ArrayList<Integer>>());
-		  for(int j=0; j<21; j++)
-			  Answers.get(i).add(new ArrayList<Integer>());
+		  Answers.add(new ArrayList<ArrayList<IntegerPair>>());
+		  for(int j=0; j<V; j++)
+			  Answers.get(i).add(new ArrayList<IntegerPair>());
 	  }
   }
 
   int Query(int s, int t, int k) {
     int ans = INF;
-    
     //randomly check any k, if empty, generate the dijkstra sssp on it
     //else, answer should already be generated
-    if(Answers.get(s).get(2).isEmpty()) {
+    if(Answers.get(s).get(t).isEmpty()) {
     	dijkstra(s);
     }
-    
-    //search for the answer, skip searching for k=1 since will be -1
-    for(int i=k; i>1; i--) {
-    	ArrayList<Integer> next = Answers.get(s).get(i);
 
-    	//if pass the k boundary for the graph, or k restriction by query
-    	if(next.isEmpty()) {
+    for(IntegerPair next : Answers.get(s).get(t)) {
+    	if(next.first() > k)
     		continue;
-    	} else {
-        	ans = next.get(t);
-        	break;
-    	}
+    	ans = next.second();
+
     }
     
     return ans == INF ? -1 : ans;
@@ -57,9 +50,7 @@ class Bleeding {
   private void dijkstraPrep(int source) {
 	  dist = new ArrayList<Integer>(V);
 	  pq = new TreeSet<IntegerTriple>();
-	  
 	  //constructing dist of INF values representing vertices, answers matrix
-	  
 	  //init all other vertices except source into PQ
 	  for(int j = 0; j<V; j++) {
         dist.add(INF);
@@ -76,17 +67,12 @@ class Bleeding {
 		dijkstraPrep(source);
 
 		int currK = 2;
-
 		pq.add(new IntegerTriple(currK, 0, source)); // add source in with dist 0
 		while (!pq.isEmpty()) {
 			IntegerTriple next = pq.first();
 			pq.remove(next); // finish the dequeue
 
-			if (currK < next.first()) {
-//				System.out.println(currK + ":: " + dist);
-				Answers.get(source).set(currK, (ArrayList<Integer>) dist.clone());
-				currK = next.first();
-			}
+			currK = next.first();
 			if (next.first() >= 21) {break;}
 
 			int k = next.first() + 1;
@@ -94,10 +80,11 @@ class Bleeding {
 
 			while (neighbours.hasNext()) {
 				IntegerPair ee = neighbours.next();
-
-				
 				if (dist.get(ee.second()) > dist.get(next.third()) + ee.first()) {
 					dist.set(ee.second(), dist.get(next.third()) + ee.first());
+					
+					//if can relax, add it as possible answer to Answers
+					Answers.get(source).get(ee.second()).add(new IntegerPair(currK, dist.get(ee.second()))); //k, cost
 					
 					pq.removeIf( e -> e.third() == ee.second() );
 					pq.add(new IntegerTriple(k, dist.get(ee.second()), ee.second()));
