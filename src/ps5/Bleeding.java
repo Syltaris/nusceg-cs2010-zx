@@ -37,9 +37,10 @@ class Bleeding {
     	dijkstra(s);
     }
     for(IntegerPair next : Answers.get(s).get(t)) {
+    	System.out.println(next.second() + " is " + next.first());
     	if(next.first() > k)
     		continue;
-    	ans = next.second();
+    	ans = Math.min(ans, next.second());
     }
     return ans == INF ? -1 : ans;
   }
