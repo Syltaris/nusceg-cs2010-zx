@@ -15,7 +15,7 @@ class Bleeding {
   
   public static final int INF = Integer.MAX_VALUE - Integer.MAX_VALUE/8;
   ArrayList<Integer> dist;
-  PriorityQueue<IntegerTriple> pq;
+  TreeSet<IntegerTriple> pq;
   private ArrayList< ArrayList < ArrayList < Integer > > > Answers; //V*K*V matrix of answers, stores all the valid SPs, INF if unreachable
   
   public Bleeding() {}
@@ -56,54 +56,55 @@ class Bleeding {
 
   private void dijkstraPrep(int source) {
 	  dist = new ArrayList<Integer>(V);
-	  pq = new PriorityQueue<IntegerTriple>();
+	  pq = new TreeSet<IntegerTriple>();
 	  
 	  //constructing dist of INF values representing vertices, answers matrix
-    for(int j = 0; j<V; j++) {
+	  
+	  //init all other vertices except source into PQ
+	  for(int j = 0; j<V; j++) {
         dist.add(INF);
+        if(j == source)
+        	continue;
+        pq.add(new IntegerTriple(INF, INF, j));
     }
     dist.set(source, 0);
 }
   
-@SuppressWarnings("unchecked")
-public void dijkstra(int source) {
-	  dijkstraPrep(source); //inits the dist[] and pq
-	  
-	  int currK = 2;
-	  
-	  //djikstra optimized, lazy DS
-      pq.add(new IntegerTriple(currK, dist.get(source), source)); //k, D[u], u
-      while(!pq.isEmpty()) {
-          IntegerTriple next = pq.poll(); //dequeue min item
-          
-          //at this point, should have processed all 'k' distances, add to Kth array for the answers, (check for 20th k limit too)
-          if(currK < next.first()) {
-        	  Answers.get(source).set(currK, (ArrayList<Integer>)dist.clone());
-//        	  for(Integer e : dist) 
-//        		  Answers.get(source).get(currK).add(e);
-//        	  																													System.out.println(currK + ":: " + dist);
-        	  currK = next.first();
-          }
-          if (next.first() >= 21) {
-        	  break;
-          }
-          
-          
-          int k = next.first() + 1;     	  //now processing next 'hospitals' with higher k than this current node
+	@SuppressWarnings("unchecked")
+	//normal dijkstra
+	public void dijkstra(int source) {
+		dijkstraPrep(source);
 
-          if(next.second() == dist.get(next.third())) {//if d == D[u]
-               Iterator<IntegerPair> neighbours = AdjList.get(next.third()).iterator();
-               while(neighbours.hasNext()) {
-                   IntegerPair ee = neighbours.next();
-                   if(dist.get(ee.second()) > dist.get(next.third()) + ee.first()) {//if can relax, relax, then add back to PQ
-                       dist.set(ee.second(), dist.get(next.third()) + ee.first()); //if D[v] > D[u] + w(u,v)...                      
-                       pq.add(new IntegerTriple(k, dist.get(ee.second()), ee.second()));
-                   }
-               }
-          }
-      }
-  }
+		int currK = 2;
 
+		pq.add(new IntegerTriple(currK, 0, source)); // add source in with dist 0
+		while (!pq.isEmpty()) {
+			IntegerTriple next = pq.first();
+			pq.remove(next); // finish the dequeue
+
+			if (currK < next.first()) {
+//				System.out.println(currK + ":: " + dist);
+				Answers.get(source).set(currK, (ArrayList<Integer>) dist.clone());
+				currK = next.first();
+			}
+			if (next.first() >= 21) {break;}
+
+			int k = next.first() + 1;
+			Iterator<IntegerPair> neighbours = AdjList.get(next.third()).iterator();
+
+			while (neighbours.hasNext()) {
+				IntegerPair ee = neighbours.next();
+
+				
+				if (dist.get(ee.second()) > dist.get(next.third()) + ee.first()) {
+					dist.set(ee.second(), dist.get(next.third()) + ee.first());
+					
+					pq.removeIf( e -> e.third() == ee.second() );
+					pq.add(new IntegerTriple(k, dist.get(ee.second()), ee.second()));
+				}
+			}
+		}
+	}
 
   void run() throws Exception {
     // you can alter this method if you need to do so
