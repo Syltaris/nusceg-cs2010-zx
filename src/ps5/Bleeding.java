@@ -37,9 +37,8 @@ class Bleeding {
     	dijkstra(s);
     }
     for(IntegerPair next : Answers.get(s).get(t)) {
-    	System.out.println(next.second() + " is " + next.first());
-    	if(next.first() > k)
-    		continue;
+    	if(next == null || next.first() > k)
+    		break;
     	ans = Math.min(ans, next.second());
     }
     return ans == INF ? -1 : ans;
@@ -61,16 +60,16 @@ class Bleeding {
 		dijkstraPrep(source);
 
 		int currK = 2;
-		pq.add(new IntegerTriple(0, currK, source)); // add source in with dist 0
+		pq.add(new IntegerTriple(currK, 0, source)); // add source in with dist 0
 		while (!pq.isEmpty()) {
 			IntegerTriple next = pq.poll();
 
-			currK = next.second();
+			currK = next.first();
 			if (currK >= 21) {break;}
 
 			int k = currK + 1;
 			
-			if(next.first() == dist.get(next.third())) {
+			if(next.second() == dist.get(next.third())) {
 				Iterator<IntegerPair> neighbours = AdjList.get(next.third()).iterator();
 				while (neighbours.hasNext()) {
 					IntegerPair ee = neighbours.next();
@@ -80,7 +79,7 @@ class Bleeding {
 						//if can relax, add it as possible answer to Answers
 						Answers.get(source).get(ee.second()).add(new IntegerPair(currK, dist.get(ee.second()))); //k, cost
 						
-						pq.add(new IntegerTriple(dist.get(ee.second()), k, ee.second()));
+						pq.add(new IntegerTriple(k, dist.get(ee.second()), ee.second()));
 					}
 				}
 			}
