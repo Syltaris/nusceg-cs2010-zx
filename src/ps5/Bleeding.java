@@ -13,7 +13,7 @@ class Bleeding {
   private int Q; // number of queries
   private ArrayList < ArrayList < IntegerPair > > AdjList; // the weighted graph (the Singapore map), the length of each edge (road) is stored here too, as the weight of edge
   
-  public static final int INF = Integer.MAX_VALUE - Integer.MAX_VALUE/8;
+  public static final int INF = Integer.MAX_VALUE;
   ArrayList<Integer> dist;
   PriorityQueue<IntegerTriple> pq;
   
@@ -25,10 +25,10 @@ class Bleeding {
     int ans = INF;
     ArrayList<ArrayList<Integer>> answers = dijkstra(s, k);
     for(int i=k; i>1; i--){
-    	if(answers.get(i) == null || answers.get(i).get(t) == INF)
-    		continue;
+//    	if(answers.get(i).get(t) == null)
+//    		continue;
     	ans = Math.min(answers.get(i).get(t), ans);
-    	break;
+
     }
     return ans == INF ? -1 : ans;
   }
@@ -36,8 +36,6 @@ class Bleeding {
   private void dijkstraPrep(int source) {
 	  dist = new ArrayList<Integer>(V);
 	  pq = new PriorityQueue<IntegerTriple>();
-	  //constructing dist of INF values representing vertices, answers matrix
-	  //init all other vertices except source into PQ
 	  for(int j = 0; j<V; j++) {
         dist.add(INF);
 	  }
@@ -50,7 +48,7 @@ class Bleeding {
 		
 		ArrayList<ArrayList<Integer>> answers = new ArrayList<ArrayList<Integer>>(21); //to store all Ks
 		for(int i=0; i<21; i++) {
-			answers.add(new ArrayList<Integer>()); //K*V
+			answers.add(new ArrayList<Integer>(V)); //K*V
 			for(int j=0; j<V; j++)
 				answers.get(i).add(INF);
 		}
@@ -70,8 +68,13 @@ class Bleeding {
 					if (dist.get(ee.second()) > dist.get(next.second()) + ee.first()) {
 						dist.set(ee.second(), dist.get(next.second()) + ee.first());
 						
+						
 						//if can relax, add it as possible answer to Answers
 						answers.get(k).set(ee.second(), dist.get(ee.second())); //k, cost
+						
+						for(Integer each : answers.get(k))
+							System.out.print(each + ", ");
+						System.out.println();
 						
 						pq.add(new IntegerTriple( dist.get(ee.second()), ee.second(), k));
 					}
