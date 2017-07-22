@@ -17,18 +17,27 @@ class Bleeding {
   ArrayList<Integer> dist;
   PriorityQueue<IntegerTriple> pq;
   
+  ArrayList<ArrayList<PriorityQueue<IntegerPair>>> anss;
+  
   public Bleeding() {}
-
-  void PreProcess() {}
+  void PreProcess() {
+	  anss = new ArrayList<ArrayList<PriorityQueue<IntegerPair>>>();
+	  for(int i=0; i<V; i++)
+		  anss.add(new ArrayList<PriorityQueue<IntegerPair>>());
+  }
 
   int Query(int s, int t, int k) {
     int ans = INF;
-    ArrayList<ArrayList<Integer>> answers = dijkstra(s, k);
-    for(int i=k; i>1; i--){
-//    	if(answers.get(i).get(t) == null)
-//    		continue;
-    	ans = Math.min(answers.get(i).get(t), ans);
-
+    if(anss.get(s).isEmpty())
+    	anss.set(s, dijkstra(s, k));
+    
+    PriorityQueue<IntegerPair> copy = new PriorityQueue<IntegerPair>(anss.get(s).get(t));
+    while( !copy.isEmpty()) {
+    	IntegerPair next = copy.poll();
+    	if(next == null || next.second() > k)
+    		continue;
+    	ans = Math.min(ans, next.first());
+    	break;
     }
     return ans == INF ? -1 : ans;
   }
@@ -43,41 +52,34 @@ class Bleeding {
   }
   
 	//modified dijkstra
-	public ArrayList<ArrayList<Integer>> dijkstra(int source, int limit) {
+	public ArrayList<PriorityQueue<IntegerPair>> dijkstra(int source, int limit) {
 		dijkstraPrep(source);
+
+		ArrayList<PriorityQueue<IntegerPair>> answers = new ArrayList<PriorityQueue<IntegerPair>>();
+		for(int i = 0; i<V; i++)
+			answers.add(new PriorityQueue<IntegerPair>());
 		
-		ArrayList<ArrayList<Integer>> answers = new ArrayList<ArrayList<Integer>>(21); //to store all Ks
-		for(int i=0; i<21; i++) {
-			answers.add(new ArrayList<Integer>(V)); //K*V
-			for(int j=0; j<V; j++)
-				answers.get(i).add(INF);
-		}
 		int currK = 1;
-		pq.add(new IntegerTriple(0, source, currK)); // add source in with dist 0
+		pq.add(new IntegerTriple( 0, source, currK)); // add source in with dist 0
 		while (!pq.isEmpty()) {
 			IntegerTriple next = pq.poll();
 
 			currK = next.third();
-			if (currK >= limit) {continue;} //just ignore, will break when queue is empty 
+			if (currK >= limit) {continue;}
 
 			int k = currK + 1;
 			if(next.first() == dist.get(next.second())) {
 				Iterator<IntegerPair> neighbours = AdjList.get(next.second()).iterator();
 				while (neighbours.hasNext()) {
 					IntegerPair ee = neighbours.next();
+					answers.get(ee.second()).add(new IntegerPair(dist.get(next.second()) + ee.first(), k)); //k, cost
+					
 					if (dist.get(ee.second()) > dist.get(next.second()) + ee.first()) {
 						dist.set(ee.second(), dist.get(next.second()) + ee.first());
-						
-						
-						//if can relax, add it as possible answer to Answers
-						answers.get(k).set(ee.second(), dist.get(ee.second())); //k, cost
-						
-						for(Integer each : answers.get(k))
-							System.out.print(each + ", ");
-						System.out.println();
-						
-						pq.add(new IntegerTriple( dist.get(ee.second()), ee.second(), k));
 					}
+					
+					if(dist.get(ee.second()) != INF)
+						pq.add(new IntegerTriple(dist.get(ee.second()), ee.second(), k));
 				}
 			}
 		}
