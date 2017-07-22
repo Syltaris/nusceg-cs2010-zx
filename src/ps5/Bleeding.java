@@ -16,30 +16,16 @@ class Bleeding {
   public static final int INF = Integer.MAX_VALUE - Integer.MAX_VALUE/8;
   ArrayList<Integer> dist;
   PriorityQueue<IntegerTriple> pq;
-  private ArrayList< ArrayList < ArrayList < IntegerPair > > > Answers; //V*V*K matrix of answers, stores all the valid SPs, INF if unreachable
   
   public Bleeding() {}
 
-  void PreProcess() {	  
-	  Answers = new ArrayList<ArrayList<ArrayList<IntegerPair>>>(V);
-	  for(int i=0; i<V; i++) {
-		  Answers.add(new ArrayList<ArrayList<IntegerPair>>());
-		  for(int j=0; j<V; j++)
-			  Answers.get(i).add(new ArrayList<IntegerPair>());
-	  }
-  }
+  void PreProcess() {}
 
   int Query(int s, int t, int k) {
     int ans = INF;
-    //randomly check any k, if empty, generate the dijkstra sssp on it
-    //else, answer should already be generated
-    if(Answers.get(s).get(t).isEmpty()) {
-    	dijkstra(s);
-    }
-    for(IntegerPair next : Answers.get(s).get(t)) {
-    	if(next == null || next.first() > k)
-    		break;
-    	ans = Math.min(ans, next.second());
+    ArrayList<ArrayList<IntegerPair>> answers = dijkstra(s, k);
+    for(IntegerPair answ : answers.get(t)){
+    	ans = Math.min(answ.second(), ans);
     }
     return ans == INF ? -1 : ans;
   }
@@ -56,34 +42,39 @@ class Bleeding {
   }
   
 	//modified dijkstra
-	public void dijkstra(int source) {
+	public ArrayList<ArrayList<IntegerPair>> dijkstra(int source, int limit) {
 		dijkstraPrep(source);
-
-		int currK = 2;
-		pq.add(new IntegerTriple(currK, 0, source)); // add source in with dist 0
+		
+		ArrayList<ArrayList<IntegerPair>> answers = new ArrayList<ArrayList<IntegerPair>>(V);
+		for(int i=0; i<V; i++)
+			answers.add(new ArrayList<IntegerPair>()); //V*K
+		
+		int currK = 1;
+		pq.add(new IntegerTriple(0, source, currK)); // add source in with dist 0
 		while (!pq.isEmpty()) {
 			IntegerTriple next = pq.poll();
 
-			currK = next.first();
-			if (currK >= 21) {break;}
+			currK = next.third();
+			if (currK >= limit) {continue;} //just ignore, will break when queue is empty 
 
 			int k = currK + 1;
-			
-			if(next.second() == dist.get(next.third())) {
-				Iterator<IntegerPair> neighbours = AdjList.get(next.third()).iterator();
+			if(next.first() == dist.get(next.second())) {
+				Iterator<IntegerPair> neighbours = AdjList.get(next.second()).iterator();
 				while (neighbours.hasNext()) {
 					IntegerPair ee = neighbours.next();
-					if (dist.get(ee.second()) > dist.get(next.third()) + ee.first()) {
-						dist.set(ee.second(), dist.get(next.third()) + ee.first());
+					if (dist.get(ee.second()) > dist.get(next.second()) + ee.first()) {
+						dist.set(ee.second(), dist.get(next.second()) + ee.first());
 						
 						//if can relax, add it as possible answer to Answers
-						Answers.get(source).get(ee.second()).add(new IntegerPair(currK, dist.get(ee.second()))); //k, cost
+						answers.get(ee.second()).add(new IntegerPair(k, dist.get(ee.second()))); //k, cost
 						
-						pq.add(new IntegerTriple(k, dist.get(ee.second()), ee.second()));
+						pq.add(new IntegerTriple( dist.get(ee.second()), ee.second(), k));
 					}
 				}
 			}
 		}
+		
+		return answers;
 	}
 
   void run() throws Exception {
