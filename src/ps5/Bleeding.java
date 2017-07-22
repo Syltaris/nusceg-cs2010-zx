@@ -23,9 +23,12 @@ class Bleeding {
 
   int Query(int s, int t, int k) {
     int ans = INF;
-    ArrayList<ArrayList<IntegerPair>> answers = dijkstra(s, k);
-    for(IntegerPair answ : answers.get(t)){
-    	ans = Math.min(answ.second(), ans);
+    ArrayList<ArrayList<Integer>> answers = dijkstra(s, k);
+    for(int i=k; i>1; i--){
+    	if(answers.get(i) == null || answers.get(i).get(t) == INF)
+    		continue;
+    	ans = Math.min(answers.get(i).get(t), ans);
+    	break;
     }
     return ans == INF ? -1 : ans;
   }
@@ -42,13 +45,15 @@ class Bleeding {
   }
   
 	//modified dijkstra
-	public ArrayList<ArrayList<IntegerPair>> dijkstra(int source, int limit) {
+	public ArrayList<ArrayList<Integer>> dijkstra(int source, int limit) {
 		dijkstraPrep(source);
 		
-		ArrayList<ArrayList<IntegerPair>> answers = new ArrayList<ArrayList<IntegerPair>>(V);
-		for(int i=0; i<V; i++)
-			answers.add(new ArrayList<IntegerPair>()); //V*K
-		
+		ArrayList<ArrayList<Integer>> answers = new ArrayList<ArrayList<Integer>>(21); //to store all Ks
+		for(int i=0; i<21; i++) {
+			answers.add(new ArrayList<Integer>()); //K*V
+			for(int j=0; j<V; j++)
+				answers.get(i).add(INF);
+		}
 		int currK = 1;
 		pq.add(new IntegerTriple(0, source, currK)); // add source in with dist 0
 		while (!pq.isEmpty()) {
@@ -66,7 +71,7 @@ class Bleeding {
 						dist.set(ee.second(), dist.get(next.second()) + ee.first());
 						
 						//if can relax, add it as possible answer to Answers
-						answers.get(ee.second()).add(new IntegerPair(k, dist.get(ee.second()))); //k, cost
+						answers.get(k).set(ee.second(), dist.get(ee.second())); //k, cost
 						
 						pq.add(new IntegerTriple( dist.get(ee.second()), ee.second(), k));
 					}
