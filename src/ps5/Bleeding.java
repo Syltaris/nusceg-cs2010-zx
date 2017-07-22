@@ -1,4 +1,3 @@
-package ps5;
 
 import java.util.*;
 import java.io.*;
@@ -17,28 +16,19 @@ class Bleeding {
   ArrayList<Integer> dist;
   PriorityQueue<IntegerTriple> pq;
   
-  ArrayList<ArrayList<PriorityQueue<IntegerPair>>> anss;
-  
   public Bleeding() {}
-  void PreProcess() {
-	  anss = new ArrayList<ArrayList<PriorityQueue<IntegerPair>>>();
-	  for(int i=0; i<V; i++)
-		  anss.add(new ArrayList<PriorityQueue<IntegerPair>>());
-  }
+  void PreProcess() {}
 
   int Query(int s, int t, int k) {
     int ans = INF;
-    if(anss.get(s).isEmpty())
-    	anss.set(s, dijkstra(s, k));
-    
-    PriorityQueue<IntegerPair> copy = new PriorityQueue<IntegerPair>(anss.get(s).get(t));
-    while( !copy.isEmpty()) {
-    	IntegerPair next = copy.poll();
-    	if(next == null || next.second() > k)
+    int[][] ansarr = dijkstra(s, k);
+
+    for(int i=k; i>1; i--) {
+    	if(ansarr[i][t] == 0)
     		continue;
-    	ans = Math.min(ans, next.first());
-    	break;
+    	ans = Math.min(ans, ansarr[i][t]);
     }
+    
     return ans == INF ? -1 : ans;
   }
 
@@ -52,14 +42,17 @@ class Bleeding {
   }
   
 	//modified dijkstra
-	public ArrayList<PriorityQueue<IntegerPair>> dijkstra(int source, int limit) {
-		dijkstraPrep(source);
+	public int[][] dijkstra(int source, int limit) {
+//		dijkstraPrep(source);
+		pq = new PriorityQueue<IntegerTriple>();
 
-		ArrayList<PriorityQueue<IntegerPair>> answers = new ArrayList<PriorityQueue<IntegerPair>>();
-		for(int i = 0; i<V; i++)
-			answers.add(new PriorityQueue<IntegerPair>());
-		
+		int[][] dist = new int[limit+1][V];
+		for(int i=0; i<=limit; i++)
+			for(int j=0; j<V; j++)
+				dist[i][j] = INF;
+
 		int currK = 1;
+		dist[currK][source] = 0;
 		pq.add(new IntegerTriple( 0, source, currK)); // add source in with dist 0
 		while (!pq.isEmpty()) {
 			IntegerTriple next = pq.poll();
@@ -68,23 +61,21 @@ class Bleeding {
 			if (currK >= limit) {continue;}
 
 			int k = currK + 1;
-			if(next.first() == dist.get(next.second())) {
+			if(next.first() == dist[currK][next.second()]) {
 				Iterator<IntegerPair> neighbours = AdjList.get(next.second()).iterator();
 				while (neighbours.hasNext()) {
 					IntegerPair ee = neighbours.next();
-					answers.get(ee.second()).add(new IntegerPair(dist.get(next.second()) + ee.first(), k)); //k, cost
 					
-					if (dist.get(ee.second()) > dist.get(next.second()) + ee.first()) {
-						dist.set(ee.second(), dist.get(next.second()) + ee.first());
+					if(dist[k][ee.second()] > dist[currK][next.second()] + ee.first()) {
+						dist[k][ee.second()] = dist[currK][next.second()] + ee.first();
+						
+						pq.add(new IntegerTriple(dist[k][ee.second()], ee.second(), k));
 					}
-					
-					if(dist.get(ee.second()) != INF)
-						pq.add(new IntegerTriple(dist.get(ee.second()), ee.second(), k));
 				}
 			}
 		}
 		
-		return answers;
+		return dist;
 	}
 
   void run() throws Exception {
